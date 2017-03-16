@@ -69,7 +69,7 @@
 
     for (var i in oas) {
       var a = oas[i];
-      addAttribute(a.pkey, a.pvalue);
+      addAttribute(a.pkey, a.pvalue, a.pengvalue);
     }
 
     for (var i in las) {
@@ -127,7 +127,7 @@
     });
 
     $('#oa-add').click(function () {
-      addAttribute('', '');
+      addAttribute('', '', '');
     });
 
     $('#or-add').click(function () {
@@ -355,8 +355,8 @@
       + '<td><button class="btn btn-default btn-sm rm-row" data-key="' + name + '" type="button">{@pre type="content" key="remove"/}</button></td></tr>');
   }
 
-  function addAttribute (k, v) {
-    $('#oa-table > tbody:last').append('<tr><td><input type="text" class="form-control input-sm" value="' + k + '"/></td><td><input type="text" class="form-control input-sm" value="' + v + '"/></td><td><button class="btn btn-default btn-sm rm-row" type="button">{@pre type="content" key="remove"/}</button></td></tr>');
+  function addAttribute (k, loc, eng) {
+    $('#oa-table > tbody:last').append('<tr><td><input type="text" class="form-control input-sm" value="' + k + '"/></td><td><input type="text" class="form-control input-sm" value="' + loc + '"/></td><td><input type="text" class="form-control input-sm" value="' + eng + '"/></td><td><button class="btn btn-default btn-sm rm-row" type="button">{@pre type="content" key="remove"/}</button></td></tr>');
   }
 
   function addLocAttribute (k, v) {
@@ -624,8 +624,9 @@
       <table id="oa-table" class="table table-condensed table-multi">
         <thead>
           <tr>
-            <th>{@pre type="content" key="name"/}</th>
-            <th>{@pre type="content" key="value"/}</th>
+            <th>{@pre type="content" key="subsku"/}</th>
+            <th>{@pre type="content" key="locname"/}</th>
+            <th>{@pre type="content" key="engname"/}</th>
             <th>{@pre type="content" key="actions"/}</th>
           </tr>
         </thead>
