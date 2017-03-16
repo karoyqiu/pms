@@ -1,0 +1,74 @@
+{>"layouts/subpage" /}
+
+{<subHead}
+<script src="/js/holder.min.js"></script>
+<script type="text/javascript">
+  $('.carousel').carousel();
+</script>
+<style type="text/css">
+  .carousel-inner > .item > img { margin: 0 auto; }
+</style>
+{/subHead}
+
+{<subBody}
+<div class="page-header">
+  <h1>{product.locname}&nbsp;<small>{@pre type="content" key="detailedPics"/}</small></h1>
+</div>
+<div id="carousel-example-generic" class="carousel slide" data-ride="carousel">
+  <!-- Indicators -->
+  <ol class="carousel-indicators">
+    {#product.pictures}
+    <li data-target="#carousel-example-generic" data-slide-to="{$idx}" {@eq key="{$idx}" value="0"}class="active"{/eq}></li>
+    {/product.pictures}
+  </ol>
+
+  <!-- Wrapper for slides -->
+  <div class="carousel-inner">
+    {?product.pictures}
+      {#product.pictures}
+        <div class='item{@eq key="{$idx}" value="0"} active{/eq}'>
+          <img src="/images/{.}" />
+          <div class="carousel-caption">
+            <p>
+              <form class="form-horizontal" role="form" action="/product/pictures/remove" method="post">
+                <input type="hidden" name="id" value="{product._id}"/>
+                <input type="hidden" name="picture" value="{.}"/>
+                <input type="hidden" name="_csrf" value="{_csrf}"/>
+                <button type="submit" class="btn btn-danger">{@pre type="content" key="remove"/}</button>
+              </form>
+            </p>
+          </div>
+        </div>
+      {/product.pictures}
+    {:else}
+    <div class="item active">
+      <img data-src='holder.js/100%x300/text:{@pre type="content" key="noPic"/}' />
+    </div>
+    {/product.pictures}
+  </div>
+
+  {?product.pictures}
+  <!-- Controls -->
+  <a class="left carousel-control" href="#carousel-example-generic" data-slide="prev">
+    <span class="glyphicon glyphicon-chevron-left"></span>
+  </a>
+  <a class="right carousel-control" href="#carousel-example-generic" data-slide="next">
+    <span class="glyphicon glyphicon-chevron-right"></span>
+  </a>
+  {/product.pictures}
+</div>
+<hr />
+<form class="form-horizontal" role="form" enctype="multipart/form-data" action="/product/pictures/upload" method="post">
+  <div class="form-group">
+    <label class="col-sm-2 control-label">{@pre type="content" key="addPic"/}</label>
+    <div class="col-sm-5">
+      <input type="file" class="form-control input-sm" id="pic" name="pic" accept="image/*" required multiple/>
+    </div>
+    <div class="col-sm-2">
+      <input type="hidden" name="id" value="{product._id}"/>
+      <input type="hidden" name="_csrf" value="{_csrf}"/>
+      <button type="submit" class="btn btn-success btn-sm">{@pre type="content" key="add"/}</button>
+    </div>
+  </div>
+</form>
+{/subBody}

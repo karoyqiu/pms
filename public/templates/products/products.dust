@@ -1,0 +1,183 @@
+{>"layouts/subpage" /}
+
+{<subHead}
+<link href="/css/bootstrap-select.min.css" rel="stylesheet"/>
+<script src="/js/bootstrap-select.min.js"></script>
+<link rel="stylesheet" type="text/css" href="/css/bootstrap-datetimepicker.min.css"/>
+<script type="text/javascript" src="/js/bootstrap-datetimepicker.min.js"></script>
+<script type="text/javascript" src="/js/bootstrap-datetimepicker.zh-CN.js"></script>
+<script type="text/javascript">
+  $(function () {
+    {^query.c}
+    $('#c').prop('selectedIndex', -1);
+    {/query.c}
+    {^query.t}
+    $('#t').prop('selectedIndex', -1);
+    {/query.t}
+    {^query.b}
+    $('#b').prop('selectedIndex', -1);
+    {/query.b}
+    $('.selectpicker').selectpicker();
+    var format = {
+      language:  'zh-CN',
+      weekStart: 1,
+      todayBtn:  "linked",
+      autoclose: 1,
+      todayHighlight: 1,
+      startView: 2,
+      minView: 2,
+      forceParse: 0
+    };
+    {?query.af}
+    format.initialDate = '{query.af}';
+    {:else}
+    format.initialDate = new Date;
+    {/query.af}
+    $('#af-picker').datetimepicker(format);
+    {?query.at}
+    format.initialDate = '{query.at}';
+    {:else}
+    format.initialDate = new Date;
+    {/query.at}
+    $('#at-picker').datetimepicker(format);
+  });
+</script>
+{/subHead}
+
+{<subBody}
+<div class="page-header">
+  {?query._update}
+    <h1>{@pre type="content" key="recentUpdates"/}</h1>
+  {:else}
+    <h1>{@pre type="content" key="title"/}</h1>
+  {/query._update}
+</div>
+<form class="form-horizontal" role="form" action="" method="get">
+  <div class="form-group">
+    <label for="n" class="col-sm-1 control-label input-sm">{@pre type="content" key="productName"/}</label>
+    <div class="col-sm-6">
+      <input class="form-control input-sm" id="n" name="n" value="{query.n}" />
+    </div>
+    <label class="col-sm-1 control-label input-sm" for="c">{@pre type="content" key="category"/}</label>
+    <div class="col-sm-3">
+      <select id="c" name="c" class="selectpicker" title='{@pre type="content" key="any"/}' data-live-search="true" data-size="auto" data-style="btn btn-default btn-sm">
+      {#categories}
+        <optgroup label="{name}">
+          {#subCategories}
+          <option value="{code}-{scode}" title="{name} - {sname}" {@eq key="{query.c}" value="{code}-{scode}" type="string"}selected="selected"{/eq}>{sname}</option>
+          {/subCategories}
+        </optgroup>
+      {/categories}
+      </select>
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-sm-1 control-label input-sm" for="p">{@pre type="content" key="number"/}</label>
+    <div class="col-sm-6">
+      <input type="text" class="form-control input-sm" id="p" name="p" value="{query.p}" />
+    </div>
+    <label class="col-sm-1 control-label input-sm" for="t">{@pre type="content" key="status"/}</label>
+    <div class="col-sm-3">
+      <select class="selectpicker" data-width="auto" data-style="btn btn-default btn-sm" data-size="auto" id="t" name="t" title='{@pre type="content" key="any"/}'>
+        <option {@eq key="{query.t}" value="0"}selected{/eq} value="0">{@pre type="content" key="active"/}</option>
+        <option {@eq key="{query.t}" value="1"}selected{/eq} value="1">{@pre type="content" key="inactive"/}</option>
+      </select>
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-sm-1 control-label input-sm" for="af">{@pre type="content" key="addedAt"/}</label>
+    <div class="col-sm-3 input-group date form_date" id="af-picker" data-date="" data-date-format="yyyy-mm-dd" data-link-field="af" data-link-format="yyyy-mm-dd">
+      <input type="text" class="form-control input-sm date" value="{query.af}" readonly/>
+      <span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>
+      <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+    </div>
+    <div class="col-sm-3 input-group date form_date" id="at-picker" data-date="" data-date-format="yyyy-mm-dd" data-link-field="at" data-link-format="yyyy-mm-dd">
+      <input type="text" class="form-control input-sm date" value="{query.at}" readonly/>
+      <span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>
+      <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+    </div>
+    <input type="hidden" id="af" name="af" value="{query.af}"/>
+    <input type="hidden" id="at" name="at" value="{query.at}"/>
+    <label class="col-sm-1 control-label input-sm" for="b">{@pre type="content" key="addedBy"/}</label>
+    <div class="col-sm-3">
+      <select id="b" name="b" class="selectpicker" title='{@pre type="content" key="any"/}' data-live-search="true" data-size="auto" data-style="btn btn-default btn-sm">
+      {#users}
+        <option value="{_id}" {@eq key="{query.b}" value="{_id}" type="string"}selected="selected"{/eq}>{displayName}</option>
+      {/users}
+      </select>
+    </div>
+  </div>
+  <div class="form-group">
+    <div class="col-sm-offset-1 col-sm-6">
+      <input type="hidden" name="l" value="{limit}" />
+      <button type="submit" class="btn btn-default">{@pre type="content" key="search"/}</button>&nbsp;
+      <a href="/products/list" class="btn btn-default">{@pre type="content" key="clear"/}</a>
+    </div>
+    <div class="col-sm-3">
+      <a class="btn btn-primary" href="/products/add">{@pre type="content" key="addProduct"/}</a>
+    </div>
+  </div>
+</form>
+<br />
+{?products}
+<table class="table table-striped table-hover">
+  <thead>
+    <tr>
+      <th>{@pre type="content" key="addedAt"/}</th>
+      <th>{@pre type="content" key="addedBy"/}</th>
+      <th>{@pre type="content" key="pictures"/}</th>
+      <th>{@pre type="content" key="number"/}
+      {@select key="{sort}" type="string"}
+        {@eq value="pno,asc" type="string"}
+          <a href="?s={currentPage}&amp;l={limit}&amp;sort=pno,desc&amp;{querystring}"><span class="glyphicon glyphicon-sort-by-alphabet"></span></a>
+        {/eq}
+        {@eq value="pno,desc" type="string"}
+          <a href="?s={currentPage}&amp;l={limit}&amp;sort=pno,asc&amp;{querystring}"><span class="glyphicon glyphicon-sort-by-alphabet-alt"></span></a>
+        {/eq}
+        {@default}
+          <a href="?s={currentPage}&amp;l={limit}&amp;sort=pno,asc&amp;{querystring}"><span class="glyphicon glyphicon-sort"></span></a>
+        {/default}
+      {/select}
+      </th>
+      <th>{@pre type="content" key="category"/}</th>
+      <th>{@pre type="content" key="productName"/}</th>
+      <th>{@pre type="content" key="status"/}</th>
+    </tr>
+  </thead>
+  <tbody>
+    {#products}
+    <tr>
+      <td><a href="/product/{_id}" target="_blank">{addedAt}</a></td>
+      <td><a href="/product/{_id}" target="_blank">{addedBy.displayName}</a></td>
+      <td><a href="/product/{_id}" target="_blank"><img src="/images/{primary-pic}" width="64" height="64" /></a></td>
+      <td><a href="/product/{_id}" target="_blank">{pno}</a></td>
+      <td><a href="/product/{_id}" target="_blank">{category}</a></td>
+      <td><a href="/product/{_id}" target="_blank">{locname}</a></td>
+      <td><a href="/product/{_id}" target="_blank">{@eq key="{status}" value="0"}{@pre type="content" key="active"/}{:else}{@pre type="content" key="inactive"/}{/eq}</a></td>
+    </tr>
+    {/products}
+  </tbody>
+</table>
+<ul class="pagination">
+  {@eq key="{currentPage}" value="0"}
+    <li class="disabled"><span>&laquo;</span></li>
+  {:else}
+    <li><a href='?s={@math key="{currentPage}" method="subtract" operand="1"/}&amp;l={limit}&amp;sort={sort}&amp;{querystring}'>&laquo;</a></li>
+  {/eq}
+  {#totalPages}
+    {@eq key="{$idx}" value="{currentPage}"}
+      <li class="active"><span>{@math key="{$idx}" method="add" operand="1"/}<span class="sr-only"> (current)</span></span></li>
+    {:else}
+      <li><a href="?s={$idx}&amp;l={limit}&amp;sort={sort}&amp;{querystring}">{@math key="{$idx}" method="add" operand="1"/}</a></li>
+    {/eq}
+  {/totalPages}
+  {@eq key="{currentPage}" value="{pageCount}"}
+    <li class="disabled"><span>&raquo;</span></li>
+  {:else}
+    <li><a href='?s={@math key="{currentPage}" method="add" operand="1"/}&amp;l={limit}&amp;sort={sort}&amp;{querystring}'>&raquo;</a></li>
+  {/eq}
+</ul>
+{:else}
+<p>{@pre type="content" key="noMatches"/}</p>
+{/products}
+{/subBody}

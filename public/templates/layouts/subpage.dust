@@ -1,0 +1,47 @@
+{>"layouts/master" /}
+
+{<head}
+<link rel="stylesheet" type="text/css" href="/css/affix.css">
+{+subHead /}
+{/head}
+
+{<body}
+<div class="container">
+  <div class="row">
+    <div class="col-md-3">
+      <div class="bs-sidebar hidden-print affix" role="complementary">
+        <ul class="nav bs-sidenav">
+          <li {@eq key="{page}" value="products"}class="active"{/eq}>
+            <a href="/products">{@pre type="content" key="products"/}</a>
+            <ul class="nav">
+              <li {@eq key="{subPage}" value="recentnews"}class="active"{/eq}>
+                <a href="/products">{@pre type="content" key="recentNews"/}</a>
+              </li>
+              <li {@eq key="{subPage}" value="list"}class="active"{/eq}>
+                <a href="/products/list">{@pre type="content" key="productList"/}</a>
+              </li>
+              <li {@eq key="{subPage}" value="categories"}class="active"{/eq}>
+                <a href="/categories">{@pre type="content" key="categories"/}</a>
+              </li>
+            </ul>
+          </li>
+          <li {@eq key="{page}" value="admin"}class="active"{/eq}>
+            <a href="/admin">{@pre type="content" key="admin"/}</a>
+            <ul class="nav">
+              <li {@eq key="{subPage}" value="users"}class="active"{/eq}>
+                <a href="/admin/users">{@pre type="content" key="users"/}</a>
+              </li>
+              <li {@eq key="{subPage}" value="roles"}class="active"{/eq}>
+                <a href="/admin/roles">{@pre type="content" key="roles"/}</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class="col-md-9">
+      {+subBody /}
+    </div>
+  </div>
+</div>
+{/body}

@@ -1,0 +1,333 @@
+{>"layouts/subpage" /}
+
+{<subHead}
+  <link href="/css/bootstrap-select.min.css" rel="stylesheet"/>
+  <link href="/css/treeview.css" rel="stylesheet"/>
+  <script src="/js/bootstrap-select.min.js"></script>
+  <script type="text/javascript">
+    $(function () {
+      $('.selectpicker').selectpicker();
+
+      $('.tree input[type="checkbox"]').each(function () {
+        var el = $(this);
+        checkboxChangeUp(el);
+      });
+    });
+  </script>
+{/subHead}
+
+{<subBody}
+<div class="page-header">
+  <h1>
+    {@select key="{action}" type="string"}
+      {@eq value="add"}{@pre type="content" key="addRole"/}{/eq}
+      {@eq value="modify"}{@pre type="content" key="editRole"/}{/eq}
+      {@default}{action}{/default}
+    {/select}
+  </h1>
+</div>
+<form class="form-horizontal" role="form" action="/admin/roles/add" method="post">
+  <div class="form-group">
+    <label class="col-sm-2 control-label" for="rname">{@pre type="content" key="roleName"/}</label>
+    <div class="col-sm-5">
+      <input id="rname" name="rname" type="text" class="form-control input-sm" {?role}value="{role.name}"{/role} autofocus required/>
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-sm-2 control-label" for="status">{@pre type="content" key="status"/}</label>
+    <div class="col-sm-5">
+      <select id="status" name="status" class="selectpicker" data-width="auto" data-style="btn btn-default btn-sm">
+        <option value="0" {?role}{@eq key="{role.status}" value="0"}selected{/eq}{/role}>{@pre type="content" key="active"/}</option>
+        <option value="1" {?role}{@eq key="{role.status}" value="1"}selected{/eq}{/role}>{@pre type="content" key="inactive"/}</option>
+      </select>
+      <!-- <span class="help-block">The uses who have an inactive role...</span> -->
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-sm-2 control-label" for="member-list">{@pre type="content" key="members"/}</label>
+    <div class="col-sm-4">
+      <select id="member-list" class="form-control" multiple="multiple">
+      {?role}
+        {#role.members}
+          <option value="{_id}">{name}</option>
+        {/role.members}
+      {/role}
+      </select>
+      <input type="hidden" id="members" name="members" />
+    </div>
+    <div class="btn-group-vertical btn-group-sm">
+      <button type="button" class="btn btn-default">{@pre type="content" key="add"/}</button>
+      <button type="button" class="btn btn-default">{@pre type="content" key="remove"/}</button>
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-sm-2 control-label">{@pre type="content" key="basicPer"/}</label>
+    <div class="col-sm-5">
+      <ul class="list-group tree">
+        <li class="list-group-item">
+          <input type="checkbox" /><label class="tree-toggle tree-parent">{@pre type="content" key="editProfile"/} <span class="caret"></span></label>
+          <ul class="list-group tree">
+            <li class="list-group-item"><label><input type="checkbox" name="o_e_password" {?role.permissions.o_e_password}checked{/role.permissions.o_e_password}/>{@pre type="content" key="changePassword"/}</label></li>
+            <li class="list-group-item"><label><input type="checkbox" name="o_e_email" {?role.permissions.o_e_email}checked{/role.permissions.o_e_email} />{@pre type="content" key="changeEmail"/}</label></li>
+            <li class="list-group-item"><label><input type="checkbox" name="o_e_mobile" {?role.permissions.o_e_mobile}checked{/role.permissions.o_e_mobile} />{@pre type="content" key="changeMobile"/}</label></li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-sm-2 control-label">{@pre type="content" key="productPer"/}</label>
+    <div class="col-sm-3">
+      <ul class="list-group tree">
+        <li class="list-group-item"><input type="checkbox" /><label class="tree-toggle tree-parent">{@pre type="content" key="query"/} <span class="caret"></span></label>
+          <ul class="list-group tree">
+            <li class="list-group-item"><label><input type="checkbox" name="p_q_locname" {?role.permissions.p_q_locname}checked{/role.permissions.p_q_locname} />{@pre type="content" key="locname"/}</label></li>
+            <li class="list-group-item"><label><input type="checkbox" name="p_q_engname" {?role.permissions.p_q_engname}checked{/role.permissions.p_q_engname} />{@pre type="content" key="engname"/}</label></li>
+            <li class="list-group-item"><label><input type="checkbox" name="p_q_pricat" {?role.permissions.p_q_pricat}checked{/role.permissions.p_q_pricat} />{@pre type="content" key="category"/}</label></li>
+            <li class="list-group-item"><label><input type="checkbox" name="p_q_pripic" {?role.permissions.p_q_pripic}checked{/role.permissions.p_q_pripic} />{@pre type="content" key="primaryPicture"/}</label></li>
+            <li class="list-group-item"><label><input type="checkbox" name="p_q_keywords" {?role.permissions.p_q_keywords}checked{/role.permissions.p_q_keywords} />{@pre type="content" key="keywords"/}</label></li>
+            <li class="list-group-item"><label><input type="checkbox" name="p_q_provider" {?role.permissions.p_q_provider}checked{/role.permissions.p_q_provider} />{@pre type="content" key="provider"/}</label></li>
+            <li class="list-group-item"><label><input type="checkbox" name="p_q_cost" {?role.permissions.p_q_cost}checked{/role.permissions.p_q_cost} />{@pre type="content" key="cost"/}</label></li>
+            <li class="list-group-item"><label><input type="checkbox" name="p_q_price" {?role.permissions.p_q_price}checked{/role.permissions.p_q_price} />{@pre type="content" key="price"/}</label></li>
+            <li class="list-group-item"><label><input type="checkbox" name="p_q_color" {?role.permissions.p_q_color}checked{/role.permissions.p_q_color} />{@pre type="content" key="color"/}</label></li>
+            <li class="list-group-item"><label><input type="checkbox" name="p_q_weight" {?role.permissions.p_q_weight}checked{/role.permissions.p_q_weight} />{@pre type="content" key="weight"/}</label></li>
+            <li class="list-group-item"><label><input type="checkbox" name="p_q_size" {?role.permissions.p_q_size}checked{/role.permissions.p_q_size} />{@pre type="content" key="size"/}</label></li>
+            <li class="list-group-item"><label><input type="checkbox" name="p_q_attrib" {?role.permissions.p_q_attrib}checked{/role.permissions.p_q_attrib} />{@pre type="content" key="otherAttribs"/}</label></li>
+            <li class="list-group-item"><label><input type="checkbox" name="p_q_locdesc" {?role.permissions.p_q_locdesc}checked{/role.permissions.p_q_locdesc} />{@pre type="content" key="locdesc"/}</label></li>
+            <li class="list-group-item"><label><input type="checkbox" name="p_q_engdesc" {?role.permissions.p_q_engdesc}checked{/role.permissions.p_q_engdesc} />{@pre type="content" key="engdesc"/}</label></li>
+            <li class="list-group-item"><label><input type="checkbox" name="p_q_comment" {?role.permissions.p_q_comment}checked{/role.permissions.p_q_comment} />{@pre type="content" key="comment"/}</label></li>
+          </ul>
+        </li>
+      </ul>
+      <ul class="list-group tree">
+        <li class="list-group-item"><label><input type="checkbox" name="p_d" {?role.permissions.p_d}checked{/role.permissions.p_d}/>{@pre type="content" key="delete"/}</label></li>
+      </ul>
+    </div>
+    <div class="col-sm-3">
+      <ul class="list-group tree">
+        <li class="list-group-item"><input type="checkbox" /><label class="tree-toggle tree-parent">{@pre type="content" key="add"/} <span class="caret"></span></label>
+          <ul class="list-group tree">
+            <li class="list-group-item"><label><input type="checkbox" name="p_a_locname" {?role.permissions.p_a_locname}checked{/role.permissions.p_a_locname} />{@pre type="content" key="locname"/}</label></li>
+            <li class="list-group-item"><label><input type="checkbox" name="p_a_engname" {?role.permissions.p_a_engname}checked{/role.permissions.p_a_engname} />{@pre type="content" key="engname"/}</label></li>
+            <li class="list-group-item"><label><input type="checkbox" name="p_a_pricat" {?role.permissions.p_a_pricat}checked{/role.permissions.p_a_pricat} />{@pre type="content" key="category"/}</label></li>
+            <li class="list-group-item"><label><input type="checkbox" name="p_a_pripic" {?role.permissions.p_a_pripic}checked{/role.permissions.p_a_pripic} />{@pre type="content" key="primaryPicture"/}</label></li>
+            <li class="list-group-item"><label><input type="checkbox" name="p_a_keywords" {?role.permissions.p_a_keywords}checked{/role.permissions.p_a_keywords} />{@pre type="content" key="keywords"/}</label></li>
+            <li class="list-group-item"><label><input type="checkbox" name="p_a_provider" {?role.permissions.p_a_provider}checked{/role.permissions.p_a_provider} />{@pre type="content" key="provider"/}</label></li>
+            <li class="list-group-item"><label><input type="checkbox" name="p_a_price" {?role.permissions.p_a_price}checked{/role.permissions.p_a_price} />{@pre type="content" key="cost"/}</label></li>
+            <li class="list-group-item"><label><input type="checkbox" name="p_a_color" {?role.permissions.p_a_color}checked{/role.permissions.p_a_color} />{@pre type="content" key="color"/}</label></li>
+            <li class="list-group-item"><label><input type="checkbox" name="p_a_weight" {?role.permissions.p_a_weight}checked{/role.permissions.p_a_weight} />{@pre type="content" key="weight"/}</label></li>
+            <li class="list-group-item"><label><input type="checkbox" name="p_a_size" {?role.permissions.p_a_size}checked{/role.permissions.p_a_size} />{@pre type="content" key="size"/}</label></li>
+            <li class="list-group-item"><label><input type="checkbox" name="p_a_attrib" {?role.permissions.p_a_attrib}checked{/role.permissions.p_a_attrib} />{@pre type="content" key="otherAttribs"/}</label></li>
+            <li class="list-group-item"><label><input type="checkbox" name="p_a_locdesc" {?role.permissions.p_a_locdesc}checked{/role.permissions.p_a_locdesc} />{@pre type="content" key="locdesc"/}</label></li>
+            <li class="list-group-item"><label><input type="checkbox" name="p_a_engdesc" {?role.permissions.p_a_engdesc}checked{/role.permissions.p_a_engdesc} />{@pre type="content" key="engdesc"/}</label></li>
+            <li class="list-group-item"><label><input type="checkbox" name="p_a_comment" {?role.permissions.p_a_comment}checked{/role.permissions.p_a_comment} />{@pre type="content" key="comment"/}</label></li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+    <div class="col-sm-3">
+      <ul class="list-group tree">
+        <li class="list-group-item"><input type="checkbox" /><label class="tree-toggle tree-parent">{@pre type="content" key="edit"/} <span class="caret"></span></label>
+          <ul class="list-group tree">
+            <li class="list-group-item"><label><input type="checkbox" name="p_e_locname" {?role.permissions.p_e_locname}checked{/role.permissions.p_e_locname} />{@pre type="content" key="locname"/}</label></li>
+            <li class="list-group-item"><label><input type="checkbox" name="p_e_engname" {?role.permissions.p_e_engname}checked{/role.permissions.p_e_engname}/>{@pre type="content" key="engname"/}</label></li>
+            <li class="list-group-item"><label><input type="checkbox" name="p_e_pricat" {?role.permissions.p_e_pricat}checked{/role.permissions.p_e_pricat}/>{@pre type="content" key="category"/}</label></li>
+            <li class="list-group-item"><label><input type="checkbox" name="p_e_pripic" {?role.permissions.p_e_pripic}checked{/role.permissions.p_e_pripic}/>{@pre type="content" key="primaryPicture"/}</label></li>
+            <li class="list-group-item"><label><input type="checkbox" name="p_e_keywords" {?role.permissions.p_e_keywords}checked{/role.permissions.p_e_keywords}/>{@pre type="content" key="keywords"/}</label></li>
+            <li class="list-group-item"><label><input type="checkbox" name="p_e_provider" {?role.permissions.p_e_provider}checked{/role.permissions.p_e_provider}/>{@pre type="content" key="provider"/}</label></li>
+            <li class="list-group-item"><label><input type="checkbox" name="p_e_price" {?role.permissions.p_e_price}checked{/role.permissions.p_e_price}/>{@pre type="content" key="cost"/}</label></li>
+            <li class="list-group-item"><label><input type="checkbox" name="p_e_color" {?role.permissions.p_e_color}checked{/role.permissions.p_e_color}/>{@pre type="content" key="color"/}</label></li>
+            <li class="list-group-item"><label><input type="checkbox" name="p_e_weight" {?role.permissions.p_e_weight}checked{/role.permissions.p_e_weight}/>{@pre type="content" key="weight"/}</label></li>
+            <li class="list-group-item"><label><input type="checkbox" name="p_e_size" {?role.permissions.p_e_size}checked{/role.permissions.p_e_size}/>{@pre type="content" key="size"/}</label></li>
+            <li class="list-group-item"><label><input type="checkbox" name="p_e_attrib" {?role.permissions.p_e_attrib}checked{/role.permissions.p_e_attrib}/>{@pre type="content" key="otherAttribs"/}</label></li>
+            <li class="list-group-item"><label><input type="checkbox" name="p_e_locdesc" {?role.permissions.p_e_locdesc}checked{/role.permissions.p_e_locdesc}/>{@pre type="content" key="locdesc"/}</label></li>
+            <li class="list-group-item"><label><input type="checkbox" name="p_e_engdesc" {?role.permissions.p_e_engdesc}checked{/role.permissions.p_e_engdesc}/>{@pre type="content" key="engdesc"/}</label></li>
+            <li class="list-group-item"><label><input type="checkbox" name="p_e_comment" {?role.permissions.p_e_comment}checked{/role.permissions.p_e_comment}/>{@pre type="content" key="comment"/}</label></li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-sm-2 control-label">{@pre type="content" key="proCatPer"/}</label>
+    <div class="col-sm-3">
+      <ul class="list-group tree">
+        <li class="list-group-item">
+          <input type="checkbox" /><label class="tree-toggle tree-parent">{@pre type="content" key="query"/} <span class="caret"></span></label>
+          <ul class="list-group tree">
+            <li class="list-group-item"><label><input type="checkbox" name="c_q_name" {?role.permissions.c_q_name}checked{/role.permissions.c_q_name}/>{@pre type="content" key="catName"/}</label></li>
+            <li class="list-group-item"><label><input type="checkbox" name="c_q_code" {?role.permissions.c_q_code}checked{/role.permissions.c_q_code}/>{@pre type="content" key="catCode"/}</label></li>
+          </ul>
+        </li>
+      </ul>
+      <ul class="list-group tree">
+        <li class="list-group-item"><label><input type="checkbox" name="c_d" {?role.permissions.c_d}checked{/role.permissions.c_d}/>{@pre type="content" key="delete"/}</label></li>
+      </ul>
+    </div>
+    <div class="col-sm-3">
+      <ul class="list-group tree">
+        <li class="list-group-item">
+          <input type="checkbox" /><label class="tree-toggle tree-parent">{@pre type="content" key="add"/} <span class="caret"></span></label>
+          <ul class="list-group tree">
+            <li class="list-group-item"><label><input type="checkbox" name="c_a_name" {?role.permissions.c_a_name}checked{/role.permissions.c_a_name}/>{@pre type="content" key="catName"/}</label></li>
+            <li class="list-group-item"><label><input type="checkbox" name="c_a_code" {?role.permissions.c_a_code}checked{/role.permissions.c_a_code}/>{@pre type="content" key="catCode"/}</label></li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+    <div class="col-sm-3">
+      <ul class="list-group tree">
+        <li class="list-group-item">
+          <input type="checkbox" /><label class="tree-toggle tree-parent">{@pre type="content" key="edit"/} <span class="caret"></span></label>
+          <ul class="list-group tree">
+            <li class="list-group-item"><label><input type="checkbox" name="c_e_name" {?role.permissions.c_e_name}checked{/role.permissions.c_e_name}/>{@pre type="content" key="catName"/}</label></li>
+            <li class="list-group-item"><label><input type="checkbox" name="c_e_code" {?role.permissions.c_e_code}checked{/role.permissions.c_e_code}/>{@pre type="content" key="catCode"/}</label></li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-sm-2 control-label">{@pre type="content" key="userPer"/}</label>
+    <div class="col-sm-3">
+      <ul class="list-group tree">
+        <li class="list-group-item">
+          <input type="checkbox" /><label class="tree-toggle tree-parent">{@pre type="content" key="query"/} <span class="caret"></span></label>
+          <ul class="list-group tree">
+            <li class="list-group-item"><label><input type="checkbox" name="u_q_name" {?role.permissions.u_q_name}checked{/role.permissions.u_q_name}/>{@pre type="content" key="username"/}</label></li>
+            <li class="list-group-item"><label><input type="checkbox" name="u_q_password" {?role.permissions.u_q_password}checked{/role.permissions.u_q_password}/>{@pre type="content" key="password"/}</label></li>
+            <li class="list-group-item"><label><input type="checkbox" name="u_q_display" {?role.permissions.u_q_display}checked{/role.permissions.u_q_display}/>{@pre type="content" key="displayName"/}</label></li>
+            <li class="list-group-item"><label><input type="checkbox" name="u_q_email" {?role.permissions.u_q_email}checked{/role.permissions.u_q_email}/>{@pre type="content" key="email"/}</label></li>
+            <li class="list-group-item"><label><input type="checkbox" name="u_q_mobile" {?role.permissions.u_q_mobile}checked{/role.permissions.u_q_mobile}/>{@pre type="content" key="mobile"/}</label></li>
+            <li class="list-group-item"><label><input type="checkbox" name="u_q_status" {?role.permissions.u_q_status}checked{/role.permissions.u_q_status}/>{@pre type="content" key="status"/}</label></li>
+            <li class="list-group-item"><label><input type="checkbox" name="u_q_roles" {?role.permissions.u_q_roles}checked{/role.permissions.u_q_roles}/>{@pre type="content" key="roles"/}</label></li>
+          </ul>
+        </li>
+      </ul>
+      <ul class="list-group tree">
+        <li class="list-group-item"><label><input type="checkbox" name="u_d" {?role.permissions.u_d}checked{/role.permissions.u_d}/>{@pre type="content" key="delete"/}</label></li>
+      </ul>
+    </div>
+    <div class="col-sm-3">
+      <ul class="list-group tree">
+        <li class="list-group-item">
+          <input type="checkbox" /><label class="tree-toggle tree-parent">{@pre type="content" key="add"/} <span class="caret"></span></label>
+          <ul class="list-group tree">
+            <li class="list-group-item"><label><input type="checkbox" name="u_a_name" {?role.permissions.u_a_name}checked{/role.permissions.u_a_name}/>{@pre type="content" key="username"/}</label></li>
+            <li class="list-group-item"><label><input type="checkbox" name="u_a_password" {?role.permissions.u_a_password}checked{/role.permissions.u_a_password}/>{@pre type="content" key="password"/}</label></li>
+            <li class="list-group-item"><label><input type="checkbox" name="u_a_display" {?role.permissions.u_a_display}checked{/role.permissions.u_a_display}/>{@pre type="content" key="displayName"/}</label></li>
+            <li class="list-group-item"><label><input type="checkbox" name="u_a_email" {?role.permissions.u_a_email}checked{/role.permissions.u_a_email}/>{@pre type="content" key="email"/}</label></li>
+            <li class="list-group-item"><label><input type="checkbox" name="u_a_mobile" {?role.permissions.u_a_mobile}checked{/role.permissions.u_a_mobile}/>{@pre type="content" key="mobile"/}</label></li>
+            <li class="list-group-item"><label><input type="checkbox" name="u_a_status" {?role.permissions.u_a_status}checked{/role.permissions.u_a_status}/>{@pre type="content" key="status"/}</label></li>
+            <li class="list-group-item"><label><input type="checkbox" name="u_a_roles" {?role.permissions.u_a_roles}checked{/role.permissions.u_a_roles}/>{@pre type="content" key="roles"/}</label></li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+    <div class="col-sm-3">
+      <ul class="list-group tree">
+        <li class="list-group-item">
+          <input type="checkbox" /><label class="tree-toggle tree-parent">{@pre type="content" key="edit"/} <span class="caret"></span></label>
+          <ul class="list-group tree">
+            <li class="list-group-item"><label><input type="checkbox" name="u_e_name" {?role.permissions.u_e_name}checked{/role.permissions.u_e_name}/>{@pre type="content" key="username"/}</label></li>
+            <li class="list-group-item"><label><input type="checkbox" name="u_e_password" {?role.permissions.u_e_password}checked{/role.permissions.u_e_password}/>{@pre type="content" key="password"/}</label></li>
+            <li class="list-group-item"><label><input type="checkbox" name="u_e_display" {?role.permissions.u_e_display}checked{/role.permissions.u_e_display}/>{@pre type="content" key="displayName"/}</label></li>
+            <li class="list-group-item"><label><input type="checkbox" name="u_e_email" {?role.permissions.u_e_email}checked{/role.permissions.u_e_email}/>{@pre type="content" key="email"/}</label></li>
+            <li class="list-group-item"><label><input type="checkbox" name="u_e_mobile" {?role.permissions.u_e_mobile}checked{/role.permissions.u_e_mobile}/>{@pre type="content" key="mobile"/}</label></li>
+            <li class="list-group-item"><label><input type="checkbox" name="u_e_status" {?role.permissions.u_e_status}checked{/role.permissions.u_e_status}/>{@pre type="content" key="status"/}</label></li>
+            <li class="list-group-item"><label><input type="checkbox" name="u_e_roles" {?role.permissions.u_e_roles}checked{/role.permissions.u_e_roles}/>{@pre type="content" key="roles"/}</label></li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-sm-2 control-label">{@pre type="content" key="rolePer"/}</label>
+    <div class="col-sm-3">
+      <ul class="list-group tree">
+        <li class="list-group-item">
+          <input type="checkbox" /><label class="tree-toggle tree-parent">{@pre type="content" key="query"/} <span class="caret"></span></label>
+          <ul class="list-group tree">
+            <li class="list-group-item"><label><input type="checkbox" name="r_q_name" {?role.permissions.r_q_name}checked{/role.permissions.r_q_name}/>{@pre type="content" key="roleName"/}</label></li>
+            <li class="list-group-item"><label><input type="checkbox" name="r_q_status" {?role.permissions.r_q_status}checked{/role.permissions.r_q_status}/>{@pre type="content" key="status"/}</label></li>
+            <li class="list-group-item"><label><input type="checkbox" name="r_q_members" {?role.permissions.r_q_members}checked{/role.permissions.r_q_members}/>{@pre type="content" key="members"/}</label></li>
+            <li class="list-group-item">
+              <input type="checkbox" /><label class="tree-toggle tree-parent">{@pre type="content" key="permissions"/} <span class="caret"></span></label>
+              <ul class="list-group tree">
+                <li class="list-group-item"><label><input type="checkbox" name="r_q_bp" {?role.permissions.r_q_bp}checked{/role.permissions.r_q_bp}/>{@pre type="content" key="basicPer"/}</label></li>
+                <li class="list-group-item"><label><input type="checkbox" name="r_q_pp" {?role.permissions.r_q_pp}checked{/role.permissions.r_q_pp}/>{@pre type="content" key="productPer"/}</label></li>
+                <li class="list-group-item"><label><input type="checkbox" name="r_q_cp" {?role.permissions.r_q_cp}checked{/role.permissions.r_q_cp}/>{@pre type="content" key="proCatPer"/}</label></li>
+                <li class="list-group-item"><label><input type="checkbox" name="r_q_up" {?role.permissions.r_q_up}checked{/role.permissions.r_q_up}/>{@pre type="content" key="userPer"/}</label></li>
+                <li class="list-group-item"><label><input type="checkbox" name="r_q_rp" {?role.permissions.r_q_rp}checked{/role.permissions.r_q_rp}/>{@pre type="content" key="rolePer"/}</label></li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+      </ul>
+      <ul class="list-group tree">
+        <li class="list-group-item"><label><input type="checkbox" name="r_d" {?role.permissions.r_d}checked{/role.permissions.r_d}/>{@pre type="content" key="delete"/}</label></li>
+      </ul>
+    </div>
+    <div class="col-sm-3">
+      <ul class="list-group tree">
+        <li class="list-group-item">
+          <input type="checkbox" /><label class="tree-toggle tree-parent">{@pre type="content" key="add"/} <span class="caret"></span></label>
+          <ul class="list-group tree">
+            <li class="list-group-item"><label><input type="checkbox" name="r_a_name" {?role.permissions.r_a_name}checked{/role.permissions.r_a_name}/>{@pre type="content" key="roleName"/}</label></li>
+            <li class="list-group-item"><label><input type="checkbox" name="r_a_status" {?role.permissions.r_a_status}checked{/role.permissions.r_a_status}/>{@pre type="content" key="status"/}</label></li>
+            <li class="list-group-item"><label><input type="checkbox" name="r_a_members" {?role.permissions.r_a_members}checked{/role.permissions.r_a_members}/>{@pre type="content" key="members"/}</label></li>
+            <li class="list-group-item">
+              <input type="checkbox" /><label class="tree-toggle tree-parent">{@pre type="content" key="permissions"/} <span class="caret"></span></label>
+              <ul class="list-group tree">
+                <li class="list-group-item"><label><input type="checkbox" name="r_a_bp" {?role.permissions.r_a_bp}checked{/role.permissions.r_a_bp}/>{@pre type="content" key="basicPer"/}</label></li>
+                <li class="list-group-item"><label><input type="checkbox" name="r_a_pp" {?role.permissions.r_a_pp}checked{/role.permissions.r_a_pp}/>{@pre type="content" key="productPer"/}</label></li>
+                <li class="list-group-item"><label><input type="checkbox" name="r_a_cp" {?role.permissions.r_a_cp}checked{/role.permissions.r_a_cp}/>{@pre type="content" key="proCatPer"/}</label></li>
+                <li class="list-group-item"><label><input type="checkbox" name="r_a_up" {?role.permissions.r_a_up}checked{/role.permissions.r_a_up}/>{@pre type="content" key="userPer"/}</label></li>
+                <li class="list-group-item"><label><input type="checkbox" name="r_a_rp" {?role.permissions.r_a_rp}checked{/role.permissions.r_a_rp}/>{@pre type="content" key="rolePer"/}</label></li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+    <div class="col-sm-3">
+      <ul class="list-group tree">
+        <li class="list-group-item">
+          <input type="checkbox" /><label class="tree-toggle tree-parent">{@pre type="content" key="edit"/} <span class="caret"></span></label>
+          <ul class="list-group tree">
+            <li class="list-group-item"><label><input type="checkbox" name="r_e_name" {?role.permissions.r_e_name}checked{/role.permissions.r_e_name}/>{@pre type="content" key="roleName"/}</label></li>
+            <li class="list-group-item"><label><input type="checkbox" name="r_e_status" {?role.permissions.r_e_status}checked{/role.permissions.r_e_status}/>{@pre type="content" key="status"/}</label></li>
+            <li class="list-group-item"><label><input type="checkbox" name="r_e_members" {?role.permissions.r_e_members}checked{/role.permissions.r_e_members}/>{@pre type="content" key="members"/}</label></li>
+            <li class="list-group-item">
+              <input type="checkbox" /><label class="tree-toggle tree-parent">{@pre type="content" key="permissions"/} <span class="caret"></span></label>
+              <ul class="list-group tree">
+                <li class="list-group-item"><label><input type="checkbox" name="r_e_bp" {?role.permissions.r_e_bp}checked{/role.permissions.r_e_bp}/>{@pre type="content" key="basicPer"/}</label></li>
+                <li class="list-group-item"><label><input type="checkbox" name="r_e_pp" {?role.permissions.r_e_pp}checked{/role.permissions.r_e_pp}/>{@pre type="content" key="productPer"/}</label></li>
+                <li class="list-group-item"><label><input type="checkbox" name="r_e_cp" {?role.permissions.r_e_cp}checked{/role.permissions.r_e_cp}/>{@pre type="content" key="proCatPer"/}</label></li>
+                <li class="list-group-item"><label><input type="checkbox" name="r_e_up" {?role.permissions.r_e_up}checked{/role.permissions.r_e_up}/>{@pre type="content" key="userPer"/}</label></li>
+                <li class="list-group-item"><label><input type="checkbox" name="r_e_rp" {?role.permissions.r_e_rp}checked{/role.permissions.r_e_rp}/>{@pre type="content" key="rolePer"/}</label></li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div class="form-group">
+    <input type="hidden" name="_csrf" value="{_csrf}"/>
+    <input type="hidden" name="action" value="{action}"/>
+    <input type="hidden" name="id", value="{role._id}"/>
+    <div class="col-sm-offset-2 col-sm-5">
+      <button type="submit" class="btn btn-success">
+        {@select key="{action}" type="string"}
+          {@eq value="add"}{@pre type="content" key="add"/}{/eq}
+          {@eq value="modify"}{@pre type="content" key="save"/}{/eq}
+          {@default}{action}{/default}
+        {/select}
+      </button>&nbsp;
+      <a href="/admin/roles" class="btn btn-default">{@pre type="content" key="cancel"/}</a>
+    </div>
+  </div>
+</form>
+<script type='text/javascript' src="/js/treeview.js"></script>
+{/subBody}

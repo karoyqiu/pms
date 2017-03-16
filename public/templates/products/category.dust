@@ -1,0 +1,83 @@
+{>"layouts/subpage" /}
+
+{<subHead}
+<script type="text/javascript">
+  var subs = {?category}{category.subCategories|s|js}{:else}[]{/category};
+  var noSubCat = '{@pre type="content" key="noSubCat"/}';
+
+  function addSubCategory (n, c) {
+    if (c) {
+      c += '" readonly="readonly';
+    };
+
+    $('#sc-table > tbody:last').append('<tr><td><input type="text" class="form-control input-sm" value="' + n +'"/></td><td><input type="text" class="form-control input-sm" value="' + c + '"/></td><td><button class="btn btn-default btn-sm rm-role" type="button">{@pre type="content" key="remove"/}</button></td></tr>');
+  }
+</script>
+<script src="/js/category.js"></script>
+{/subHead}
+
+{<subBody}
+<div class="page-header">
+  <h1>
+    {@eq key="{action}" value="modify" type="string"}
+      {@pre type="content" key="editCat"/}
+    {:else}
+      {@pre type="content" key="addCat"/}
+    {/eq}
+  </h1>
+</div>
+{?error}
+<div class="alert alert-danger">
+  {@pre type="content" key="alreadyExists"/}
+</div>
+{/error}
+<form id="cat-form" class="form-horizontal" role="form" action="/categories/{action}" method="post" accept-charset="UTF-8">
+  <div class="form-group">
+    <label class="col-sm-2 control-label" for="name">{@pre type="content" key="catName"/}</label>
+    <div class="col-sm-5">
+      <input type="text" class="form-control input-sm" id="name" name="name" {?category}value="{category.name}"{/category} autofocus required />
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-sm-2 control-label" for="code">{@pre type="content" key="catCode"/}</label>
+    <div class="col-sm-5">
+      <input type="text" class="form-control input-sm" id="code" name="code" {?category}value="{category.code}"{/category} {@eq key="{action}" value="modify" type="string"}readonly{/eq} required />
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-sm-2 control-label" for="password">{@pre type="content" key="subcats"/}</label>
+    <div class="col-sm-5">
+      <table id="sc-table" class="table table-condensed">
+        <thead>
+          <tr>
+            <th>{@pre type="content" key="name"/}</th>
+            <th>{@pre type="content" key="code"/}</th>
+            <th>{@pre type="content" key="actions"/}</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+        <tfoot>
+          <tr>
+            <td colspan="3"><button id="sc-add" type="button" class="btn btn-default btn-sm">{@pre type="content" key="add"/}</button></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+    <input type="hidden" name="sub" />
+    <input type="hidden" name="id", value="{category._id}"/>
+    <input type="hidden" name="_csrf" value="{_csrf}"/>
+  </div>
+  <div class="form-group">
+    <div class="col-sm-offset-2 col-sm-5">
+      <button type="submit" class="btn btn-success">
+        {@select key="{action}" type="string"}
+          {@eq value="add"}{@pre type="content" key="add"/}{/eq}
+          {@eq value="modify"}{@pre type="content" key="save"/}{/eq}
+          {@default}{action}{/default}
+        {/select}
+      </button>&nbsp;
+      <a href="/categories" class="btn btn-default">{@pre type="content" key="cancel"/}</a>
+    </div>
+  </div>
+</form>
+{/subBody}

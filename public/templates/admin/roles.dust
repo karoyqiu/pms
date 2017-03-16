@@ -1,0 +1,32 @@
+{>"layouts/subpage" /}
+
+{<subBody}
+<div class="page-header">
+  <h1>{@pre type="content" key="title"/}</h1>
+</div>
+<table class="table table-striped table-hover">
+  <thead>
+    <tr>
+      <th>{@pre type="content" key="name"/}</th>
+      <th>{@pre type="content" key="count"/}</th>
+      <th>{@pre type="content" key="status"/}</th>
+    </tr>
+  </thead>
+  <tbody>
+    {#roles}
+    <tr>
+      <td><a href="role/{_id}">{name}</a></td>
+      <td>{memberCount}</td>
+      <td>
+        {@select key="{status}"}
+          {@eq value="0"}{@pre type="content" key="active"/}{/eq}
+          {@eq value="1"}{@pre type="content" key="inactive"/}{/eq}
+          {@default}{status}{/default}
+        {/select}
+      </td>
+    </tr>
+    {/roles}
+  </tbody>
+</table>
+<a class="btn btn-primary" href="/admin/roles/add">{@pre type="content" key="add"/}</a>
+{/subBody}

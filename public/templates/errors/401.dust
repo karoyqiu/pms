@@ -1,0 +1,5 @@
+{>"layouts/subpage" /}
+
+{<subBody}
+{@pre type="content" key="permissionDenied" /}
+{/subBody}

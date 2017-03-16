@@ -1,0 +1,13 @@
+{>"layouts/master" /}
+
+{<head}
+<meta http-equiv="refresh" content="5; url={redirect}" />
+{/head}
+
+{<body}
+<div class="container">
+  <div class="alert alert-success">
+    {@pre type="content" key="success"/}
+  </div>
+</div>
+{/body}

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{+title}{@pre type="content" key="title"/}{/title}</title>
+
+  <!-- Bootstrap-->
+  <link href="/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="/css/sticky-footer.css" rel="stylesheet" />
+
+  <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+  <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+  <!--[if lt IE 9]>
+    <script src="js/html5shiv.js"></script>
+    <script src="js/respond.min.js"></script>
+  <![endif]-->
+
+  <!-- jQuery (necessary for Bootstrap's JavaScript plugins)-->
+  <script src="/js/jquery-1.10.2.min.js"></script>
+  <!-- Include all compiled plugins (below), or include individual files as needed-->
+  <script src="/js/bootstrap.min.js"></script>
+
+  <script src="/js/md5.js"></script>
+
+  <script type="text/javascript">
+    $(function () {
+      $('[data-toggle="tooltip"]').tooltip({
+        container: 'body'
+      });
+
+      var email = '{user.email}';
+      email = email.toLowerCase();
+      email = CryptoJS.MD5(email);
+      $('#avatar').prop('src', 'http://www.gravatar.com/avatar/' + email + '?s=22&d=mm');
+    });
+  </script>
+  {+head /}
+</head>
+<body>
+  <div id="wrap">
+    <nav role="navigation" class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" data-toggle="collapse" data-target=".navbar-collapse" class="navbar-toggle">
+            <span class="icon-bar" />
+            <span class="icon-bar" />
+            <span class="icon-bar" />
+          </button>
+          <a href="/" class="navbar-brand"><span class="glyphicon glyphicon-barcode"></span>&nbsp;&nbsp;{@pre type="content" key="title"/}</a>
+        </div>
+        <div class="collapse navbar-collapse">
+          {#user}
+          <p class="navbar-text navbar-right"><a href="/signout" class="navbar-link" data-toggle="tooltip" data-placement="auto" title='{@pre type="content" key="signOut"/}'><span class="glyphicon glyphicon-log-out"></span></a></p>
+          <p class="navbar-text navbar-right">{displayName}</p>
+          <div class="navbar-text navbar-right">
+            <img id="avatar" />
+          </div>
+          {/user}
+        </div>
+      </div>
+    </nav>
+    {+body /}
+  </div>
+  <div id="footer">
+    <div class="container">
+      <p class="text-muted credit">{@pre type="content" key="copyright"/}&nbsp;<i>{@pre type="content" key="arrowInTheKnee"/}</i></p>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,36 @@
+{>"layouts/master" /}
+
+{<head}
+<link rel="stylesheet" type="text/css" href="css/index.css"/>
+<script type="text/javascript">
+  function hashPassword () {
+    var hash = CryptoJS.SHA1($('#password').prop('value'));
+    $('#password').prop('value', hash);
+  }
+</script>
+{/head}
+
+{<body}
+<div class="container">
+  <form class="form-signin" role="form" action="/signin" method="post" autocomplete="off" onsubmit="hashPassword();">
+    <h2 class="form-signin-heading">{@pre type="content" key="pms"/}</h2>
+    <input name="u" type="text" class="form-control" placeholder='{@pre type="content" key="username"/}' required autofocus>
+    <input id="password" name="p" type="password" class="form-control" placeholder='{@pre type="content" key="password"/}' required>
+    <label class="checkbox">
+      <input type="checkbox" name="r">{@pre type="content" key="rememberMe"/}
+    </label>
+    <input type="hidden" name="_csrf" value="{_csrf}"/>
+    <button class="btn btn-lg btn-primary btn-block" type="submit"><span class="glyphicon glyphicon-log-out"></span>&nbsp;{@pre type="content" key="signIn"/}</button>
+  </form>
+  {?error}
+  <div class="alert alert-danger">
+    {@eq key="{error}" value="failed" type="string"}
+      {@pre type="content" key="failed"/}
+    {:else}
+      {error}
+    {/eq}
+  </div>
+  {/error}
+</div>
+<script src="/js/sha1.js"></script>
+{/body}

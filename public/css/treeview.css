@@ -1,0 +1,28 @@
+.list-group {
+  margin-bottom: 0px;
+}
+
+.list-group-item {
+  padding: 5px 15px;
+  padding-right: 0px;
+  border: none;
+}
+
+input[type="checkbox"] {
+  margin-top: 0px;
+  margin-right: 0.5em;
+  vertical-align: -1px;
+}
+
+.tree label {
+  color: #555;
+  font-weight: normal;
+}
+
+.tree label.tree-parent {
+  color: #222;
+}
+
+.tree label.tree-parent:hover {
+  text-decoration: none;
+}

@@ -1,0 +1,772 @@
+{>"layouts/subpage" /}
+
+{<subHead}
+<link href="/css/bootstrap-select.min.css" rel="stylesheet"/>
+<script src="/js/bootstrap-select.min.js"></script>
+<script charset="utf-8" src="/kindeditor/kindeditor-min.js"></script>
+<script charset="utf-8" src="/kindeditor/lang/zh_CN.js"></script>
+<script src="/js/md5.js"></script>
+<script src="/js/jquery.ui.widget.js"></script>
+<script src="/js/jquery.iframe-transport.js"></script>
+<script src="/js/jquery.fileupload.js"></script>
+<style type="text/css">
+  .table tbody > tr > td.vert-align {
+      vertical-align: middle;
+  }
+
+  #ppic {
+    max-width: 400px;
+    max-height: 400px;
+  }
+</style>
+<script type="text/javascript">
+  var categories = {?categories}{categories|s|js}{:else}[]{/categories};
+  var ops = {?product.prices}{product.prices|s|js}{:else}[]{/product.prices};
+  var oas = {?product.attribs}{product.attribs|s|js}{:else}[]{/product.attribs};
+  var las = {?product.locattribs}{product.locattribs|s|js}{:else}[]{/product.locattribs};
+  var pros = {?product.providers}{product.providers|s|js}{:else}[]{/product.providers};
+  var ors = {?product.othersRefs}{product.othersRefs|s|js}{:else}[]{/product.othersRefs};
+  var pnoUpdated = false;
+
+  function __pad(n, width, z) {
+    z = z || '0';
+    n = n + '';
+    return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
+  }
+
+  function updatePno() {
+    var curCat = $('#cat').val();
+    var splitted = curCat.split('-', 2);
+
+    for (var i = 0; i < categories.length; i++) {
+      var c = categories[i];
+      if (c.code === splitted[0]) {
+        for (var j = 0; j < c.subCategories.length; j++) {
+          var sc = c.subCategories[j];
+          if (sc.scode === splitted[1]) {
+            var nn = sc.scode + __pad(sc.nextNum, 3);
+            $('#pno').prop('value', nn);
+            $('#nextNum').text(nn);
+            $('#help-next-num').show();
+            pnoUpdated = true;
+            return;
+          }
+        };
+      }
+    }
+  }
+
+  $(function () {
+    $('.selectpicker').selectpicker();
+    $('#cat').data('selectpicker').$newElement.on('hide.bs.dropdown', updatePno);
+    $('#help-next-num').hide();
+    $('#pno').change(function() { pnoUpdated = true; });
+
+    for (var i in ops) {
+      var p = ops[i];
+      addPrice(p.platform, p.quantity, p.price, p.currency, p.weight, p.express);
+    }
+
+    for (var i in oas) {
+      var a = oas[i];
+      addAttribute(a.pkey, a.pvalue);
+    }
+
+    for (var i in las) {
+      var a = las[i];
+      addLocAttribute(a.pkey, a.pvalue);
+    }
+
+    for (var i in pros) {
+      var p = pros[i];
+      addProvider(p.date, p.operator, '', p.providerName, p.link, p.price, p.weight, p.size, p.comment);
+    }
+
+    for (var i in ors) {
+      var o = ors[i];
+      addOthersRef(o.date, o.operator, o.platformName, o.othersName, o.link, o.price, o.comment);
+    }
+
+    $('#rolesModal').on('show.bs.modal', function (e) {
+      $.each(selectedRoleIds, function (index, id) {
+        $('#role_' + id).prop('checked', true);
+      });
+
+      $('#okButton').prop('class', 'btn btn-primary');
+      $('#okButton').prop('disabled', false);
+    });
+
+    $('#op-table').on('click', '.rm-row', function() {
+      for (var i = 0; i < prices.length; i++) {
+        if (prices[i].name == $(this).attr('data-key')) {
+          prices.splice(i, 1);
+          break;
+        }
+      }
+
+      $(this).closest('tr').remove();
+    });
+
+    $('#op-add').click(function () {
+      addPrice('', '', '', '', '', '');
+    });
+
+    $('#pro-add').click(function () {
+      var today = new Date();
+      addProvider(today.toLocaleDateString(), '{user.displayName}', '{user._id|h}', '', '', '', '', '');
+    });
+
+    $('#pro-table').on('click', '.rm-row', function() {
+      var r = $(this).closest('tr');
+      r.next().remove();
+      r.remove();
+    });
+
+    $('#oa-table').on('click', '.rm-row', function() {
+      $(this).closest('tr').remove();
+    });
+
+    $('#oa-add').click(function () {
+      addAttribute('', '');
+    });
+
+    $('#or-add').click(function () {
+      var today = new Date();
+      addOthersRef(today.toLocaleDateString(), '{user.displayName}', '', '', '', '', '');
+    });
+
+    $('#or-table').on('click', '.rm-row', function() {
+      var r = $(this).closest('tr');
+      r.next().remove();
+      r.remove();
+    });
+
+    $('#la-table').on('click', '.rm-row', function() {
+      $(this).closest('tr').remove();
+    });
+
+    $('#la-add').click(function () {
+      addLocAttribute('', '');
+    });
+
+    $('#log-table').on('click', '.rm-row', function() {
+      var idx = $(this).attr('data-index');
+      removedLogs.push(parseInt(idx, 10));
+      $(this).closest('tr').remove();
+    });
+
+    $('#product-form').submit(function () {
+      if (pnoUpdated) {
+        var pnoOk = false;
+
+        $.ajax({
+          url: '/products/pno/ok?pno=' + $('#pno').prop('value'),
+          async: false,
+          cache: false
+        }).done(function (data, textStatus, jqXHR) {
+          pnoOk = true;
+        });
+
+        if (!pnoOk) {
+          alert('{@pre type="content" key="repeated"/}');
+          $('#pno').focus();
+          return false;
+        };
+      }
+
+      attribs = {};
+
+      $('#oa-table > tbody > tr').each(function() {
+        var name = $('td:eq(0) input', this).val();
+        var value = $('td:eq(1) input', this).val();
+
+        if (name && value) {
+          attribs[name] = value;
+        }
+      });
+
+      locattribs = {};
+
+      $('#la-table > tbody > tr').each(function() {
+        var name = $('td:eq(0) input', this).val();
+        var value = $('td:eq(1) input', this).val();
+
+        if (name && value) {
+          locattribs[name] = value;
+        }
+      });
+
+      prices = [];
+
+      $('#op-table > tbody > tr').each(function() {
+        var platform = $('td:eq(0) input', this).val();
+        var quantity = $('td:eq(1) input', this).val();
+        var price = $('td:eq(2) input', this).val();
+        var currency = $('td:eq(3) input', this).val();
+        var weight = $('td:eq(4) input', this).val();
+        var express = $('td:eq(5) input', this).val();
+
+        if (platform && quantity && price && currency && weight && express) {
+          var name = platform + quantity + price + currency + weight + express;
+          name = CryptoJS.MD5(name);
+          name = name.toString(CryptoJS.enc.Hex);
+          prices.push({
+            name: name,
+            platform: platform,
+            quantity: quantity,
+            price: price,
+            currency: currency,
+            weight: weight,
+            express: express
+          });
+        };
+      });
+
+      providers = [];
+      ortr = $('#pro-table > tbody > tr:first');
+
+      while (ortr.is('tr'))
+      {
+        var date = $('td:eq(0) input', ortr).val();
+        var oper = $('td:eq(1) input', ortr).val();
+        var providerName = $('td:eq(2) input', ortr).val();
+        var link = $('td:eq(3) input', ortr).val();
+        var price = $('td:eq(4) input', ortr).val();
+        var weight = $('td:eq(5) input', ortr).val();
+        var size = $('td:eq(6) input', ortr).val();
+
+        ortr = ortr.next();
+        var comment = $('td:eq(1) input', ortr).val();
+
+        providers.push({
+          date: date,
+          operator: oper,
+          providerName: providerName,
+          link: link,
+          price: price,
+          weight: weight,
+          size: size,
+          comment: comment
+        });
+
+        ortr = ortr.next();
+      }
+
+      otherRefs = [];
+      ortr = $('#or-table > tbody > tr:first');
+
+      while (ortr.is('tr'))
+      {
+        var date = $('td:eq(0) input', ortr).val();
+        var oper = $('td:eq(1) input', ortr).val();
+        var platformName = $('td:eq(2) input', ortr).val();
+        var othersName = $('td:eq(3) input', ortr).val();
+        var link = $('td:eq(4) input', ortr).val();
+        var price = $('td:eq(5) input', ortr).val();
+
+        ortr = ortr.next();
+        var comment = $('td:eq(1) input', ortr).val();
+
+        otherRefs.push({
+          date: date,
+          operator: oper,
+          platformName: platformName,
+          link: link,
+          price: price,
+          othersName: othersName,
+          comment: comment
+        });
+
+        ortr = ortr.next();
+      }
+
+      $('[name="prices"]').prop('value', JSON.stringify(prices));
+      $('[name="attribs"]').prop('value', JSON.stringify(attribs));
+      $('[name="locattribs"]').prop('value', JSON.stringify(locattribs));
+      $('[name="removedLogs"]').prop('value', JSON.stringify(removedLogs));
+      $('[name="providers"]').prop('value', JSON.stringify(providers));
+      $('[name="ors"]').prop('value', JSON.stringify(otherRefs));
+    });
+
+    {@eq key="{action}" value="modify" type="string"}
+    $('#pic-packs').fileupload({
+      formData: [
+        { name: 'id', value: '{product._id}' },
+        { name: '_csrf', value: '{_csrf}' }
+      ],
+      done: function(e, data) {
+        location.reload();
+      },
+      progressall: function(e, data) {
+        var progress = parseInt(data.loaded / data.total * 100, 10);
+        progress = progress + '%';
+        $('.progress-bar').css({'width': progress}).find('span').html(progress);
+      }
+    });
+    $('#keyword-list').fileupload({
+      formData: [
+        { name: 'id', value: '{product._id}' },
+        { name: '_csrf', value: '{_csrf}' }
+      ],
+      done: function(e, data) {
+        location.reload();
+      }
+    });
+    {:else}
+    updatePno();
+    {/eq}
+
+    $('#del').click(function() {
+      return confirm('{@pre type="content" key="really"/}');
+    });
+
+    $('#save-and-update').click(function() {
+      $('[name="_update"').prop('value', '1');
+      $('#product-form').submit();
+    });
+  });
+
+  var editor;
+
+  KindEditor.ready(function(K) {
+    editor = K.create($('textarea[name!="notice"]'), {
+      allowImageUpload: false,
+      afterBlur: function(){ this.sync(); },
+      items : [
+        'fontname', 'fontsize', '|', 'forecolor', 'hilitecolor', 'bold', 'italic',
+        'underline', 'removeformat', '|', 'justifyleft', 'justifycenter', 'justifyright',
+        'insertorderedlist', 'insertunorderedlist', '|', 'emoticons', 'link']
+      });
+  });
+
+  var prices = [];
+  var attribs = {};
+  var locattribs = {};
+  var removedLogs = [];
+
+  function addPrice (platform, quantity, price, currency, weight, express) {
+    $('#op-table > tbody:last').append('<tr>'
+      + '<td><input type="text" class="form-control input-sm" value="' + platform + '"/></td>'
+      + '<td><input type="text" class="form-control input-sm" value="' + quantity + '"/></td>'
+      + '<td><input type="text" class="form-control input-sm" value="' + price + '"/></td>'
+      + '<td><input type="text" class="form-control input-sm" value="' + currency + '"/></td>'
+      + '<td><input type="text" class="form-control input-sm" value="' + weight + '"/></td>'
+      + '<td><input type="text" class="form-control input-sm" value="' + express + '"/></td>'
+      + '<td><button class="btn btn-default btn-sm rm-row" data-key="' + name + '" type="button">{@pre type="content" key="remove"/}</button></td></tr>');
+  }
+
+  function addAttribute (k, v) {
+    $('#oa-table > tbody:last').append('<tr><td><input type="text" class="form-control input-sm" value="' + k + '"/></td><td><input type="text" class="form-control input-sm" value="' + v + '"/></td><td><button class="btn btn-default btn-sm rm-row" type="button">{@pre type="content" key="remove"/}</button></td></tr>');
+  }
+
+  function addLocAttribute (k, v) {
+    $('#la-table > tbody:last').append('<tr><td><input type="text" class="form-control input-sm" value="' + k + '"/></td><td><input type="text" class="form-control input-sm" value="' + v + '"/></td><td><button class="btn btn-default btn-sm rm-row" type="button">{@pre type="content" key="remove"/}</button></td></tr>');
+  }
+
+  function addProvider (date, username, userid, provider, link, price, weight, size, comment) {
+    $('#pro-table > tbody:last').append('<tr>'
+      + '<td><input type="text" class="form-control input-sm" value="' + date + '" readonly /></td>'
+      + '<td><input type="text" class="form-control input-sm" value="' + username + '" readonly /></td>'
+      + '<td><input type="text" class="form-control input-sm" value="' + provider + '"/></td>'
+      + '<td><input type="text" class="form-control input-sm" value="' + link + '"/></td>'
+      + '<td><input type="text" class="form-control input-sm" value="' + price + '"/></td>'
+      + '<td><input type="text" class="form-control input-sm" value="' + weight + '"/></td>'
+      + '<td><input type="text" class="form-control input-sm" value="' + size + '"/></td>'
+      + '<td><button class="btn btn-default btn-sm rm-row" data-key="' + name + '" type="button">{@pre type="content" key="remove"/}</button></td></tr>'
+      + '<tr><td><label class="control-label">{@pre type="content" key="comment"/}</label></td>'
+      + '<td colspan="7"><input type="text" class="form-control input-sm" value="' + (comment ? comment : "") + '"/></td></tr>');
+  }
+
+  function addOthersRef (date, username, platformName, othersName, link, price, comment) {
+    $('#or-table > tbody:last').append('<tr>'
+      + '<td><input type="text" class="form-control input-sm" value="' + date + '" readonly /></td>'
+      + '<td><input type="text" class="form-control input-sm" value="' + username + '" readonly /></td>'
+      + '<td><input type="text" class="form-control input-sm" value="' + platformName + '"/></td>'
+      + '<td><input type="text" class="form-control input-sm" value="' + othersName + '"/></td>'
+      + '<td><input type="text" class="form-control input-sm" value="' + link + '"/></td>'
+      + '<td><input type="text" class="form-control input-sm" value="' + price + '"/></td>'
+      + '<td><button class="btn btn-default btn-sm rm-row" data-key="' + name + '" type="button">{@pre type="content" key="remove"/}</button></td></tr>'
+      + '<tr><td><label class="control-label">{@pre type="content" key="comment"/}</label></td>'
+      + '<td colspan="6"><input type="text" class="form-control input-sm" value="' + comment + '"/></td></tr>');
+  }
+</script>
+{/subHead}
+
+{<subBody}
+<div class="page-header">
+  <h1>
+    {@eq key="{action}" value="modify" type="string"}
+      {@pre type="content" key="editProduct"/}
+    {:else}
+      {@pre type="content" key="addProduct"/}
+    {/eq}
+  </h1>
+</div>
+{?error}
+<div class="alert alert-danger">
+  {@pre type="content" key="codeAlreadyExists"/}
+</div>
+{/error}
+<form id="product-form" class="form-horizontal" role="form" enctype="multipart/form-data" action="/products/{action}" method="post">
+  <div class="form-group">
+    <label class="col-sm-2 control-label" for="creator">{@pre type="content" key="creator"/}</label>
+    <div class="col-sm-5">
+      <p class="form-control-static">{product.addedBy.displayName}{?product.addedAt} {@pre type="content" key="addedAt"/} {product.addedAt}{/product.addedAt}</p>
+    </div>
+  </div>
+  {?product.modifiedAt}
+  <div class="form-group">
+    <label class="col-sm-2 control-label" for="creator">{@pre type="content" key="modifier"/}</label>
+    <div class="col-sm-5">
+      <p class="form-control-static">{product.modifiedBy.displayName}{?product.modifiedAt} {@pre type="content" key="modifiedAt"/} {product.modifiedAt}{/product.modifiedAt}</p>
+    </div>
+  </div>
+  {/product.modifiedAt}
+  <div class="form-group">
+    <label class="col-sm-2 control-label" for="status">{@pre type="content" key="status"/}</label>
+    <div class="col-sm-5">
+      <select class="selectpicker" data-width="auto" data-style="btn btn-default btn-sm" id="status" name="status">
+        <option {?product}{@eq key="{product.status}" value="0"}selected{/eq}{/product} value="0">{@pre type="content" key="active"/}</option>
+        <option {?product}{@eq key="{product.status}" value="1"}selected{/eq}{/product} value="1">{@pre type="content" key="inactive"/}</option>
+      </select>
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-sm-2 control-label" for="cat">{@pre type="content" key="category"/}</label>
+    <div class="col-sm-5">
+      <select id="cat" name="cat" class="selectpicker" data-live-search="true" data-size="auto" data-style="btn btn-default btn-sm">
+      {#categories}
+        <optgroup label="{name}">
+          {#subCategories}
+          <option value="{code}-{scode}" title="{name} - {sname}" {@eq key="{product.cat}" value="{code}-{scode}" type="string"}selected="selected"{/eq}>{sname}</option>
+          {/subCategories}
+        </optgroup>
+      {/categories}
+      </select>
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-sm-2 control-label" for="pno">{@pre type="content" key="number"/}</label>
+    <div class="col-sm-5">
+      <input type="hidden" name="original-pno" value="{product.pno}" />
+      <input type="text" class="form-control input-sm" id="pno" name="pno" value="{product.pno}" />
+      <p class="help-block" id="help-next-num">{@pre type="content" key="nextNum"/} <span id="nextNum"></span></p>
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-sm-2 control-label" for="loc">{@pre type="content" key="locname"/}</label>
+    <div class="col-sm-5">
+      <input type="text" class="form-control input-sm" id="loc" name="locname" required="required" value="{product.locname}" />
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-sm-2 control-label" for="eng">{@pre type="content" key="engname"/}</label>
+    <div class="col-sm-5">
+      <input type="text" class="form-control input-sm" id="eng" name="engname" value="{product.engname}" />
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-sm-2 control-label" for="primary-pic">{@pre type="content" key="primaryPicture"/}</label>
+    <div class="col-sm-5">
+      {?product.primary-pic}
+      <img id="ppic" src="/images/{product.primary-pic}" /><br />
+      {/product.primary-pic}
+      <input type="file" class="form-control input-sm" id="primary-pic" name="primary-pic" accept="image/*"/>
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-sm-2 control-label" for="loc-desc">{@pre type="content" key="detailedPics"/}</label>
+    <div class="col-sm-5">
+      {@eq key="{action}" value="add" type="string"}
+        <input type="file" class="form-control input-sm" id="detailed-pic" name="detailed-pic" accept="image/*" multiple/>
+      {:else}
+      <a type="button" class="btn btn-default btn-sm" href="/product/pictures/{product._id}">{@pre type="content" key="edit"/}</a>
+      {/eq}
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-sm-2 control-label" for="loc-desc">{@pre type="content" key="packs"/}</label>
+    <div class="col-sm-5">
+      {@eq key="{action}" value="modify" type="string"}
+        {#product.packs}
+        <p>
+          <a href="/images/{fileName}" target="_blank">{displayName}</a>&nbsp;
+          <a href="/product/packs/remove?id={product._id}&amp;pack={$idx}">{@pre type="content" key="remove"/}</a>
+        </p>
+        {/product.packs}
+      {/eq}
+      <input type="file" class="form-control input-sm" id="pic-packs" name="pic-packs" accept=".zip,.rar,.7z,.gz,.bz2,.xz,.tar,.wim" data-url='/product/pic-packs/upload' multiple/>
+      <div class="progress">
+        <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%;">
+          <span></span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-sm-2 control-label" for="kw">{@pre type="content" key="keywords"/}</label>
+    <div class="col-sm-5">
+      <input class="form-control input-sm" id="kw" name="keywords" value="{product.keywords}" />
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-sm-2 control-label" for="keyword-list">{@pre type="content" key="keywordList"/}</label>
+    <div class="col-sm-5">
+      {#product.keyword-list}
+        <p>
+          <a href="/images/{fileName}" target="_blank">{displayName}</a>&nbsp;
+          <a href="/product/keywordlist/remove?id={product._id}&amp;pack={$idx}">{@pre type="content" key="remove"/}</a>
+        </p>
+      {/product.keyword-list}
+      <input type="file" class="form-control input-sm" id="keyword-list" name="keyword-list" accept=".doc,.docx,.xls,.xlsx,.ppt,.pptx,text/plain" data-url='/product/keyword-list/upload' multiple />
+    </div>
+  </div>
+  {#user.permissions.p_q_provider}
+  <div class="form-group">
+    <label class="col-sm-2 control-label" for="provider">{@pre type="content" key="refProvider"/}</label>
+    <div class="col-sm-5">
+      <input type="text" class="form-control input-sm" id="provider" name="provider" value="{product.provider}" />
+    </div>
+  </div>
+  {/user.permissions.p_q_provider}
+  {#user.permissions.p_q_cost}
+  <div class="form-group">
+    <label class="col-sm-2 control-label" for="cost">{@pre type="content" key="refCost"/}</label>
+    <div class="col-sm-5">
+      <input type="text" class="form-control input-sm" id="cost" name="cost" value="{product.cost}"/>
+    </div>
+  </div>
+  {/user.permissions.p_q_cost}
+
+
+  <div class="form-group">
+    <label class="col-sm-2 control-label" for="notice">{@pre type="content" key="notice"/}</label>
+    <div class="col-sm-10">
+      <textarea class="form-control" id="notice" name="notice" rows="3">{product.notice}</textarea>
+    </div>
+  </div>
+
+  {#user.permissions.p_q_provider}
+  <div class="form-group">
+    <label class="col-sm-2 control-label">{@pre type="content" key="provider"/}</label>
+    <div class="col-sm-10">
+      <table id="pro-table" class="table table-condensed table-multi">
+        <thead>
+          <tr>
+            <th>{@pre type="content" key="date"/}</th>
+            <th>{@pre type="content" key="operator"/}</th>
+            <th>{@pre type="content" key="providerName"/}</th>
+            <th>{@pre type="content" key="link"/}</th>
+            <th>{@pre type="content" key="price"/}</th>
+            <th>{@pre type="content" key="weight"/}</th>
+            <th>{@pre type="content" key="size"/}</th>
+            <th>{@pre type="content" key="actions"/}</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+        <tfoot>
+          <tr>
+            <td colspan="8"><button id="pro-add" type="button" class="btn btn-default btn-sm">{@pre type="content" key="add"/}</button></td>
+          </tr>
+        </tfoot>
+      </table>
+      <input type="hidden" name="providers" />
+    </div>
+  </div>
+  {/user.permissions.p_q_provider}
+
+
+  <div class="form-group">
+    <label class="col-sm-2 control-label" for="attributes">{@pre type="content" key="locattribs"/}</label>
+    <div class="col-sm-5">
+      <table id="la-table" class="table table-condensed table-multi">
+        <thead>
+          <tr>
+            <th>{@pre type="content" key="name"/}</th>
+            <th>{@pre type="content" key="value"/}</th>
+            <th>{@pre type="content" key="actions"/}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="vert-align">{@pre type="content" key="color"/}</td>
+            <td><input type="text" class="form-control input-sm" id="color" name="color" value="{product.color}"/></td>
+          </tr>
+          <tr>
+            <td class="vert-align">{@pre type="content" key="refWeight"/}</td>
+            <td><input type="text" class="form-control input-sm" id="weight" name="weight" value="{product.weight}" /></td>
+          </tr>
+          <tr>
+            <td class="vert-align">{@pre type="content" key="refSize"/}</td>
+            <td><input type="text" class="form-control input-sm" id="size" name="size" value="{product.size}" /></td>
+          </tr>
+          <tr>
+            <td class="vert-align">{@pre type="content" key="actualWeight"/}</td>
+            <td><input type="text" class="form-control input-sm" id="actualWeight" name="actualWeight" value="{product.actualWeight}" /></td>
+          </tr>
+          <tr>
+            <td class="vert-align">{@pre type="content" key="actualSize"/}</td>
+            <td><input type="text" class="form-control input-sm" id="actualSize" name="actualSize" value="{product.actualSize}" /></td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="3"><button id="la-add" type="button" class="btn btn-default btn-sm">{@pre type="content" key="add"/}</button></td>
+          </tr>
+        </tfoot>
+      </table>
+      <input type="hidden" name="locattribs" />
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-sm-2 control-label">{@pre type="content" key="otherAttribs"/}</label>
+    <div class="col-sm-5">
+      <table id="oa-table" class="table table-condensed table-multi">
+        <thead>
+          <tr>
+            <th>{@pre type="content" key="name"/}</th>
+            <th>{@pre type="content" key="value"/}</th>
+            <th>{@pre type="content" key="actions"/}</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+        <tfoot>
+          <tr>
+            <td colspan="3"><button id="oa-add" type="button" class="btn btn-default btn-sm">{@pre type="content" key="add"/}</button></td>
+          </tr>
+        </tfoot>
+      </table>
+      <input type="hidden" name="attribs" />
+    </div>
+  </div>
+
+
+  <div class="form-group">
+    <label class="col-sm-2 control-label">{@pre type="content" key="othersRefs"/}</label>
+    <div class="col-sm-10">
+      <table id="or-table" class="table table-condensed table-multi">
+        <thead>
+          <tr>
+            <th>{@pre type="content" key="date"/}</th>
+            <th>{@pre type="content" key="operator"/}</th>
+            <th>{@pre type="content" key="platformName"/}</th>
+            <th>{@pre type="content" key="othersName"/}</th>
+            <th>{@pre type="content" key="link"/}</th>
+            <th>{@pre type="content" key="price"/}</th>
+            <th>{@pre type="content" key="actions"/}</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+        <tfoot>
+          <tr>
+            <td colspan="7"><button id="or-add" type="button" class="btn btn-default btn-sm">{@pre type="content" key="add"/}</button></td>
+          </tr>
+        </tfoot>
+      </table>
+      <input type="hidden" name="ors" />
+    </div>
+  </div>
+
+
+
+  {#user.permissions.p_q_price}
+  <div class="form-group">
+    <label class="col-sm-2 control-label">{@pre type="content" key="otherPrices"/}</label>
+    <div class="col-sm-10">
+      <table id="op-table" class="table table-condensed table-multi">
+        <thead>
+          <tr>
+            <th>{@pre type="content" key="platform"/}</th>
+            <th>{@pre type="content" key="quantity"/}</th>
+            <th>{@pre type="content" key="price"/}</th>
+            <th>{@pre type="content" key="currency"/}</th>
+            <th>{@pre type="content" key="parcel"/}</th>
+            <th>{@pre type="content" key="express"/}</th>
+            <th>{@pre type="content" key="actions"/}</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+        <tfoot>
+          <tr>
+            <td colspan="7"><button id="op-add" type="button" class="btn btn-default btn-sm">{@pre type="content" key="add"/}</button></td>
+          </tr>
+        </tfoot>
+      </table>
+      <input type="hidden" name="prices" />
+    </div>
+  </div>
+  {/user.permissions.p_q_price}
+  <div class="form-group">
+    <label class="col-sm-2 control-label" for="loc-desc">{@pre type="content" key="locdesc"/}</label>
+    <div class="col-sm-5">
+      <textarea class="form-control input-sm" id="loc-desc" name="locdesc" rows="3">{product.locdesc}</textarea>
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-sm-2 control-label" for="eng-desc">{@pre type="content" key="engdesc"/}</label>
+    <div class="col-sm-5">
+      <textarea class="form-control input-sm" id="eng-desc" name="engdesc" rows="3">{product.engdesc}</textarea>
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-sm-2 control-label" for="comment">{@pre type="content" key="comment"/}</label>
+    <div class="col-sm-5">
+      <textarea class="form-control input-sm" id="comment" name="comment" rows="3">{product.comment}</textarea>
+    </div>
+  </div>
+  {@eq key="{action}" value="modify" type="string"}
+  <div class="form-group">
+    <label class="col-sm-2 control-label" for="attributes">{@pre type="content" key="log"/}</label>
+    <div class="col-sm-5">
+      <table id="log-table" class="table table-condensed table-multi">
+        <thead>
+          <tr>
+            <th>{@pre type="content" key="logTime"/}</th>
+            <th>{@pre type="content" key="logger"/}</th>
+            <th>{@pre type="content" key="log"/}</th>
+            <th>{@pre type="content" key="actions"/}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {#product.logs}
+          <tr>
+            <td>{time}</td>
+            <td>{user.displayName}</td>
+            <td>{log}</td>
+            <td><button class="btn btn-default btn-sm rm-row" type="button" data-index="{$idx}">{@pre type="content" key="remove"/}</button></td>
+          </tr>
+          {/product.logs}
+        </tbody>
+        <tfoot>
+          <tr>
+            <td>{@pre type="content" key="now"/}</td>
+            <td>{user.displayName}</td>
+            <td colspan="2"><input type="text" class="form-control input-sm" id="log" name="log" /></td>
+          </tr>
+        </tfoot>
+      </table>
+      <input type="hidden" name="removedLogs" />
+    </div>
+  </div>
+  {/eq}
+  <div class="form-group">
+    <div class="col-sm-offset-2 col-sm-8">
+      <input type="hidden" name="id" value="{product._id}"/>
+      <input type="hidden" name="_csrf" value="{_csrf}"/>
+      <input type="hidden" name="_update" value="0"/>
+      <button type="submit" class="btn btn-success">
+        {@select key="{action}" type="string"}
+          {@eq value="add"}{@pre type="content" key="add"/}{/eq}
+          {@eq value="modify"}{@pre type="content" key="save"/}{/eq}
+          {@default}{action}{/default}
+        {/select}
+      </button>&nbsp;
+      <button type="button" class="btn btn-primary" id="save-and-update">{@pre type="content" key="saveAndUpdate"/}</button>&nbsp;
+      <a href="/products/list" class="btn btn-default">{@pre type="content" key="cancel"/}</a>
+      {@eq key="{action}" value="modify" type="string"}&nbsp;
+      <a href="/products/delete/{product._id|h}" class="btn btn-danger" id="del">{@pre type="content" key="delete"/}</a>
+      {/eq}
+    </div>
+  </div>
+</form>
+{/subBody}

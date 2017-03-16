@@ -1,0 +1,36 @@
+{
+  "middleware": {
+    "appsec": {
+      "csrf": false,
+      "csp": false,
+      "p3p": false,
+      "xframe": "SAMEORIGIN"
+    },
+//
+//      "compiler": {
+//          "dust": "templates",
+//          "less": "css"
+//      },
+//
+    "session": {
+      "module": "memory",
+      "secret": "3dda05ef8b572651e7d5e4f6c4e1368d375a5e88"
+    },
+
+    "static": {
+      "srcRoot": "path:./public",
+      "rootPath": "path:./.build"
+    },
+
+    "bodyParser": {
+      "limit": 536870912,
+      "uploadDir": "./tmp"
+    },
+
+    "errorPages": {
+      "404": "errors/404",
+      "500": "errors/500",
+      "503": "errors/503"
+    }
+  }
+}

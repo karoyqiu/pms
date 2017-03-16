@@ -1,0 +1,113 @@
+{>"layouts/subpage" /}
+
+{<subHead}
+  <link href="/css/bootstrap-select.min.css" rel="stylesheet"/>
+  <script src="/js/bootstrap-select.min.js"></script>
+  <script type="text/javascript">
+    var allRoles = {roles|s|js};
+    var selectedRoleIds = {selectedRoleIds|s|js};
+  </script>
+  <script src="/js/user.js"></script>
+{/subHead}
+
+{<subBody}
+<div class="page-header">
+  <h1>
+    {@select key="{action}" type="string"}
+      {@eq value="add"}{@pre type="content" key="addUser"/}{/eq}
+      {@eq value="modify"}{@pre type="content" key="editUser"/}{/eq}
+      {@default}{action}{/default}
+    {/select}
+  </h1>
+</div>
+<form class="form-horizontal" role="form" action="/admin/users/add" method="post" accept-charset="UTF-8" onsubmit="prepareRoles();">
+  <div class="form-group">
+    <label class="col-sm-2 control-label" for="username">{@pre type="content" key="username"/}</label>
+    <div class="col-sm-5">
+      <input type="text" class="form-control input-sm" id="username" name="username" {?user}value="{user.name}"{/user} autofocus required />
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-sm-2 control-label" for="status">{@pre type="content" key="status"/}</label>
+    <div class="col-sm-5">
+      <select class="selectpicker" data-width="auto" data-style="btn btn-default btn-sm" id="status" name="status">
+        <option {?user}{@eq key="{user.status}" value="0"}selected{/eq}{/user} value="0">{@pre type="content" key="active"/}</option>
+        <option {?user}{@eq key="{user.status}" value="1"}selected{/eq}{/user} value="1">{@pre type="content" key="inactive"/}</option>
+      </select>
+      <span class="help-block">{@pre type="content" key="inactiveUsers"/}</span>
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-sm-2 control-label" for="password">{@pre type="content" key="password"/}</label>
+    <div class="col-sm-5">
+      <input type="password" class="form-control input-sm" id="password" name="password" {?user}value="{user.password}"{/user} required/>
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-sm-2 control-label" for="displayname">{@pre type="content" key="displayName"/}</label>
+    <div class="col-sm-5">
+      <input type="text" class="form-control input-sm" id="displayname" name="displayname" {?user}value="{user.displayName}"{/user}/>
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-sm-2 control-label" for="email">{@pre type="content" key="email"/}</label>
+    <div class="col-sm-5">
+      <input type="email" class="form-control input-sm" id="email" name="email" {?user}value="{user.email}"{/user}/>
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-sm-2 control-label" for="mobile">{@pre type="content" key="mobile"/}</label>
+    <div class="col-sm-5">
+      <input type="text" class="form-control input-sm" id="mobile" name="mobile" {?user}value="{user.mobile}"{/user}/>
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-sm-2 control-label" for="roles">{@pre type="content" key="roles"/}</label>
+    <div class="col-sm-4">
+      <select class="form-control" id="roleList" multiple="multiple">
+      </select>
+      <input type="hidden" name="roles" id="roles" />
+      <input type="hidden" name="_csrf" value="{_csrf}"/>
+      <input type="hidden" name="action" value="{action}"/>
+      <input type="hidden" name="id", value="{user._id}"/>
+    </div>
+    <button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#rolesModal">{@pre type="content" key="edit"/}</button>
+  </div>
+  <div class="form-group">
+    <div class="col-sm-offset-2 col-sm-5">
+      <button type="submit" class="btn btn-success">
+        {@select key="{action}" type="string"}
+          {@eq value="add"}{@pre type="content" key="add"/}{/eq}
+          {@eq value="modify"}{@pre type="content" key="save"/}{/eq}
+          {@default}{action}{/default}
+        {/select}
+      </button>&nbsp;
+      <a href="/admin/users" class="btn btn-default">{@pre type="content" key="cancel"/}</a>
+    </div>
+  </div>
+</form>
+<div class="modal fade" id="rolesModal" tabindex="-1" role="dialog" aria-labelledby="rolesModalTitle" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="rolesModalTitle">{@pre type="content" key="selectRole"/}</h4>
+      </div>
+      <div class="modal-body">
+        <form role="form">
+        {#roles}
+          <div class="checkbox">
+            <label><input type="checkbox" name="{_id}" id="role_{_id}" class="role-checkbox" onchange="updateOKButton();" />{name}</label>
+          </div>
+        {/roles}
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" id="okButton">{@pre type="content" key="ok"/}</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">{@pre type="content" key="cancel"/}</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="/js/sha1.js"></script>
+{/subBody}
