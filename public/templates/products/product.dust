@@ -179,11 +179,17 @@
       $('#oa-table > tbody > tr').each(function() {
         var name = $('td:eq(0) input', this).val();
         var value = $('td:eq(1) input', this).val();
+        var eng = $('td:eq(2) input', this).val();
+        console.debug(name, value, eng);
 
-        if (name && value) {
-          attribs[name] = value;
+        if (name && value && eng) {
+          attribs[name] = {
+            "loc": value,
+            "eng": eng
+          };
         }
       });
+      console.debug(JSON.stringify(attribs));
 
       locattribs = {};
 

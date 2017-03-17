@@ -48,7 +48,8 @@ function __bodyToProduct (body) {
     if (attribs.hasOwnProperty(prop)) {
       p.attribs.push({
         pkey: prop,
-        pvalue: attribs[prop]
+        pvalue: attribs[prop].loc,
+        pengvalue: attribs[prop].eng
       });
     }
   }
