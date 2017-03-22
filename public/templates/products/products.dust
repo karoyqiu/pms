@@ -40,6 +40,20 @@
     format.initialDate = new Date;
     {/query.at}
     $('#at-picker').datetimepicker(format);
+
+    $("#exportBasicData").click(function(){
+      var pids = [];
+
+      $('#ptable > tbody > tr').each(function() {
+        var chkbox = $('td:eq(0) input', this);
+
+        if (chkbox.is(":checked")) {
+          pids.push(chkbox.attr("pid"));
+        }
+      });
+
+      $.post('/products/export/basic', { ids: pids });
+    });
   });
 </script>
 {/subHead}
@@ -113,16 +127,19 @@
       <button type="submit" class="btn btn-default">{@pre type="content" key="search"/}</button>&nbsp;
       <a href="/products/list" class="btn btn-default">{@pre type="content" key="clear"/}</a>
     </div>
-    <div class="col-sm-3">
-      <a class="btn btn-primary" href="/products/add">{@pre type="content" key="addProduct"/}</a>
+    <div class="col-sm-5">
+      <a class="btn btn-primary" href="/products/add">{@pre type="content" key="addProduct"/}</a>&nbsp;
+      <button id="exportBasicData" type="button" class="btn btn-default">{@pre type="content" key="exportBasicData"/}</button>&nbsp;
+      <button id="exportProviderData" type="button" class="btn btn-default">{@pre type="content" key="exportProviderData"/}</button>&nbsp;
     </div>
   </div>
 </form>
 <br />
 {?products}
-<table class="table table-striped table-hover">
+<table id="ptable" class="table table-striped table-hover">
   <thead>
     <tr>
+      <th><input type="checkbox"></th>
       <th>{@pre type="content" key="addedAt"/}</th>
       <th>{@pre type="content" key="addedBy"/}</th>
       <th>{@pre type="content" key="pictures"/}</th>
@@ -147,6 +164,7 @@
   <tbody>
     {#products}
     <tr>
+      <td><input type="checkbox" pid="{_id}"></td>
       <td><a href="/product/{_id}" target="_blank">{addedAt}</a></td>
       <td><a href="/product/{_id}" target="_blank">{addedBy.displayName}</a></td>
       <td><a href="/product/{_id}" target="_blank"><img src="/images/{primary-pic}" width="64" height="64" /></a></td>

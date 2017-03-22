@@ -189,7 +189,6 @@
           };
         }
       });
-      console.debug(JSON.stringify(attribs));
 
       locattribs = {};
 

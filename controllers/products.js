@@ -809,4 +809,11 @@ module.exports = function (app) {
       }
     });
   });
+
+  app.post('/products/export/basic', checkPermissions('products', 'list', {p_e_locname: true}), function (req, res) {
+    var model = new ProductsModel();
+    var categoriesModel = new CategoriesModel();
+    var ids = req.body.ids;
+    res.send(200);
+  });
 };
