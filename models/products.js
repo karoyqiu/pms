@@ -157,4 +157,60 @@ ProductsModel.prototype.deleteById = function(id, callback) {
 };
 
 
+ProductsModel.prototype.exportBasicData = function(ids, callback) {
+  this.__getCollection(function (err, col) {
+    if (err) {
+      callback(err);
+    } else {
+      var objs = [];
+
+      ids.forEach(function(id) {
+        objs.push(ObjectID.createFromHexString(id));
+      });
+
+      var cursor = col.find({ _id: { $in: objs }});
+      var sheet = { };
+      var row = 2;
+
+      sheet['A1'] = "*库存sku编号";
+      sheet['B1'] = "*库存sku名称";
+      sheet['E1'] = "成本价";
+      sheet['M1'] = "仓库成本价";
+      sheet['P1'] = "供应商";
+      sheet['AG1'] = "虚拟sku(多个用英文';'分割)";
+
+      cursor.each(function(err, pro) {
+        if (pro) {
+          pro.attribs.forEach(function(a) {
+            var cell = 'A' + row.toString();
+            sheet[cell] = pro.pno + '-' + a.pkey;
+            cell = 'B' + row.toString();
+            sheet[cell] = a.pkey + ' ' + a.pvalue;
+            cell = 'E' + row.toString();
+            sheet[cell] = pro.providers[0].price;
+            cell = 'M' + row.toString();
+            sheet[cell] = pro.providers[0].price;
+            cell = 'P' + row.toString();
+            sheet[cell] = pro.providers[0].providerName;
+            cell = 'AG' + row.toString();
+            sheet[cell] = pro.pno + '-' + a.pkey + a.pengvalue;
+            row++;
+          });
+        } else {
+          var workbook = {
+            SheetNames: ['库存sku导入模板'],
+            Sheets: {
+              '库存sku导入模板': sheet
+            }
+          };
+
+          console.dir(workbook);
+          callback(null, workbook);
+        }
+      });
+    }
+  });
+};
+
+
 module.exports = ProductsModel;

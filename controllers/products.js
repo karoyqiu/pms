@@ -812,8 +812,13 @@ module.exports = function (app) {
 
   app.post('/products/export/basic', checkPermissions('products', 'list', {p_e_locname: true}), function (req, res) {
     var model = new ProductsModel();
-    var categoriesModel = new CategoriesModel();
     var ids = req.body.ids;
-    res.send(200);
+    model.exportBasicData(req.body.ids, function(err, workbook) {
+      if (err) {
+        res.send(500).send(err);
+      } else {
+        res.send(workbook);
+      }
+    });
   });
 };

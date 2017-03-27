@@ -52,7 +52,9 @@
         }
       });
 
-      $.post('/products/export/basic', { ids: pids });
+      $.post('/products/export/basic', { ids: pids }, function(data) {
+        console.dir(data);
+      });
     });
   });
 </script>
