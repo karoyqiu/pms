@@ -6,6 +6,8 @@
 <link rel="stylesheet" type="text/css" href="/css/bootstrap-datetimepicker.min.css"/>
 <script type="text/javascript" src="/js/bootstrap-datetimepicker.min.js"></script>
 <script type="text/javascript" src="/js/bootstrap-datetimepicker.zh-CN.js"></script>
+<script type="text/javascript" src="/js/xlsx.full.min.js"></script>
+<script type="text/javascript" src="/js/FileSaver.min.js"></script>
 <script type="text/javascript">
   $(function () {
     {^query.c}
@@ -52,8 +54,20 @@
         }
       });
 
-      $.post('/products/export/basic', { ids: pids }, function(data) {
-        console.dir(data);
+      $.post('/products/export/basic', { ids: pids }, function(workbook) {
+        var wopts = { bookType:'xlsx', bookSST:false, type:'binary' };
+        var wbout = XLSX.write(workbook, wopts);
+        console.dir(workbook);
+
+        function s2ab(s) {
+          var buf = new ArrayBuffer(s.length);
+          var view = new Uint8Array(buf);
+          for (var i=0; i!=s.length; ++i) view[i] = s.charCodeAt(i) & 0xFF;
+          return buf;
+        }
+
+        /* the saveAs call downloads a file on the local machine */
+        saveAs(new Blob([s2ab(wbout)],{type:"application/octet-stream"}), "basic.xlsx");
       });
     });
   });

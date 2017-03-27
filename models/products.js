@@ -170,37 +170,38 @@ ProductsModel.prototype.exportBasicData = function(ids, callback) {
 
       var cursor = col.find({ _id: { $in: objs }});
       var sheet = { };
-      var row = 2;
+      var row = 1;
 
-      sheet['A1'] = "*库存sku编号";
-      sheet['B1'] = "*库存sku名称";
-      sheet['E1'] = "成本价";
-      sheet['M1'] = "仓库成本价";
-      sheet['P1'] = "供应商";
-      sheet['AG1'] = "虚拟sku(多个用英文';'分割)";
+      sheet['A1'] = { t: 's', v: '*库存sku编号' };
+      sheet['B1'] = { t: 's', v: '*库存sku名称' };
+      sheet['E1'] = { t: 's', v: '成本价' };
+      sheet['M1'] = { t: 's', v: '仓库成本价' };
+      sheet['P1'] = { t: 's', v: '供应商' };
+      sheet['AG1'] = { t: 's', v: "虚拟sku(多个用英文';'分割)" };
 
       cursor.each(function(err, pro) {
         if (pro) {
           pro.attribs.forEach(function(a) {
-            var cell = 'A' + row.toString();
-            sheet[cell] = pro.pno + '-' + a.pkey;
-            cell = 'B' + row.toString();
-            sheet[cell] = a.pkey + ' ' + a.pvalue;
-            cell = 'E' + row.toString();
-            sheet[cell] = pro.providers[0].price;
-            cell = 'M' + row.toString();
-            sheet[cell] = pro.providers[0].price;
-            cell = 'P' + row.toString();
-            sheet[cell] = pro.providers[0].providerName;
-            cell = 'AG' + row.toString();
-            sheet[cell] = pro.pno + '-' + a.pkey + a.pengvalue;
             row++;
+            var cell = 'A' + row.toString();
+            sheet[cell] = { t: 's', v: pro.pno + '-' + a.pkey };
+            cell = 'B' + row.toString();
+            sheet[cell] = { t: 's', v: a.pkey + ' ' + a.pvalue };
+            cell = 'E' + row.toString();
+            sheet[cell] = { t: 's', v: pro.providers[0].price };
+            cell = 'M' + row.toString();
+            sheet[cell] = { t: 's', v: pro.providers[0].price };
+            cell = 'P' + row.toString();
+            sheet[cell] = { t: 's', v: pro.providers[0].providerName };
+            cell = 'AG' + row.toString();
+            sheet[cell] = { t: 's', v: pro.pno + '-' + a.pkey + a.pengvalue };
           });
         } else {
+          sheet['!ref'] = 'A1:AG' + row.toString();
           var workbook = {
-            SheetNames: ['库存sku导入模板'],
+            SheetNames: ['aaa'],
             Sheets: {
-              '库存sku导入模板': sheet
+              'aaa': sheet
             }
           };
 
