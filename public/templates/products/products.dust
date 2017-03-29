@@ -43,7 +43,7 @@
     {/query.at}
     $('#at-picker').datetimepicker(format);
 
-    $("#exportBasicData").click(function(){
+    function exportData(data) {
       var pids = [];
 
       $('#ptable > tbody > tr').each(function() {
@@ -54,10 +54,9 @@
         }
       });
 
-      $.post('/products/export/basic', { ids: pids }, function(workbook) {
+      $.post('/products/export/' + data, { ids: pids }, function (workbook) {
         var wopts = { bookType:'xlsx', bookSST:false, type:'binary' };
         var wbout = XLSX.write(workbook, wopts);
-        console.dir(workbook);
 
         function s2ab(s) {
           var buf = new ArrayBuffer(s.length);
@@ -66,9 +65,16 @@
           return buf;
         }
 
-        /* the saveAs call downloads a file on the local machine */
-        saveAs(new Blob([s2ab(wbout)],{type:"application/octet-stream"}), "basic.xlsx");
+        saveAs(new Blob([s2ab(wbout)], { type: 'application/octet-stream' }), data + '.xlsx');
       });
+    }
+
+    $("#exportBasicData").click(function() {
+      exportData('basic');
+    });
+
+    $("#exportProviderData").click(function() {
+      exportData('providers');
     });
   });
 </script>

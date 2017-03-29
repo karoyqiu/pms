@@ -821,4 +821,16 @@ module.exports = function (app) {
       }
     });
   });
+
+  app.post('/products/export/providers', checkPermissions('products', 'list', {p_e_locname: true}), function (req, res) {
+    var model = new ProductsModel();
+    var ids = req.body.ids;
+    model.exportProviderData(req.body.ids, function(err, workbook) {
+      if (err) {
+        res.send(500).send(err);
+      } else {
+        res.send(workbook);
+      }
+    });
+  });
 };

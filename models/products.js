@@ -199,13 +199,67 @@ ProductsModel.prototype.exportBasicData = function(ids, callback) {
         } else {
           sheet['!ref'] = 'A1:AG' + row.toString();
           var workbook = {
-            SheetNames: ['aaa'],
+            SheetNames: ['库存SKU导入模板'],
             Sheets: {
-              'aaa': sheet
+              '库存SKU导入模板': sheet
             }
           };
 
-          console.dir(workbook);
+          //console.dir(workbook);
+          callback(null, workbook);
+        }
+      });
+    }
+  });
+};
+
+
+ProductsModel.prototype.exportProviderData = function(ids, callback) {
+  this.__getCollection(function (err, col) {
+    if (err) {
+      callback(err);
+    } else {
+      var objs = [];
+
+      ids.forEach(function(id) {
+        objs.push(ObjectID.createFromHexString(id));
+      });
+
+      var cursor = col.find({ _id: { $in: objs }});
+      var sheet = { };
+      var row = 1;
+
+      sheet['A1'] = { t: 's', v: '*供应商' };
+      sheet['B1'] = { t: 's', v: '*SKU' };
+      sheet['C1'] = { t: 's', v: '最低采购价' };
+      sheet['D1'] = { t: 's', v: '上次采购价' };
+      sheet['E1'] = { t: 's', v: '商品网址' };
+
+      cursor.each(function(err, pro) {
+        if (pro) {
+          pro.attribs.forEach(function(a) {
+            pro.providers.forEach(function(p) {
+              row++;
+              var cell = 'A' + row.toString();
+              sheet[cell] = { t: 's', v: p.providerName };
+              cell = 'B' + row.toString();
+              sheet[cell] = { t: 's', v: pro.pno + '-' + a.pkey };
+              cell = 'C' + row.toString();
+              sheet[cell] = { t: 's', v: p.price };
+              cell = 'E' + row.toString();
+              sheet[cell] = { t: 's', v: p.link };
+            });
+          });
+        } else {
+          sheet['!ref'] = 'A1:E' + row.toString();
+          var workbook = {
+            SheetNames: ['供应商关联SKU导出模板'],
+            Sheets: {
+              '供应商关联SKU导出模板': sheet
+            }
+          };
+
+          //console.dir(workbook);
           callback(null, workbook);
         }
       });
