@@ -174,9 +174,36 @@ ProductsModel.prototype.exportBasicData = function(ids, callback) {
 
       sheet['A1'] = { t: 's', v: '*库存sku编号' };
       sheet['B1'] = { t: 's', v: '*库存sku名称' };
+      sheet['C1'] = { t: 's', v: '库存sku英文名称' };
+      sheet['D1'] = { t: 's', v: 'sku状态(自动创建、等待开发、正常销售)' };
       sheet['E1'] = { t: 's', v: '成本价' };
+      sheet['F1'] = { t: 's', v: '售价' };
+      sheet['G1'] = { t: 's', v: '商品目录' };
+      sheet['H1'] = { t: 's', v: '申报品名(中文)' };
+      sheet['I1'] = { t: 's', v: '申报品名(英文)' };
+      sheet['J1'] = { t: 's', v: "商品自定义分类(多个用英文';'号隔开)" };
+      sheet['K1'] = { t: 's', v: '商品仓库' };
+      sheet['L1'] = { t: 's', v: '仓位' };
       sheet['M1'] = { t: 's', v: '仓库成本价' };
+      sheet['N1'] = { t: 's', v: '库存' };
+      sheet['O1'] = { t: 's', v: '商品重量' };
       sheet['P1'] = { t: 's', v: '供应商' };
+      sheet['Q1'] = { t: 's', v: '上次采购价格' };
+      sheet['R1'] = { t: 's', v: '最低采购价格' };
+      sheet['S1'] = { t: 's', v: '销售员' };
+      sheet['T1'] = { t: 's', v: '采购员' };
+      sheet['U1'] = { t: 's', v: '采购天数' };
+      sheet['V1'] = { t: 's', v: '最小采购数量' };
+      sheet['W1'] = { t: 's', v: '最大采购数量' };
+      sheet['X1'] = { t: 's', v: '库存警戒天数' };
+      sheet['Y1'] = { t: 's', v: '警戒库存' };
+      sheet['Z1'] = { t: 's', v: '配货员' };
+      sheet['AA1'] = { t: 's', v: '包材' };
+      sheet['AB1'] = { t: 's', v: '可包装个数' };
+      sheet['AC1'] = { t: 's', v: '原厂SKU' };
+      sheet['AD1'] = { t: 's', v: '是否带电池（0/1）' };
+      sheet['AE1'] = { t: 's', v: '库存图片地址' };
+      sheet['AF1'] = { t: 's', v: '备注' };
       sheet['AG1'] = { t: 's', v: "虚拟sku(多个用英文';'分割)" };
 
       cursor.each(function(err, pro) {
