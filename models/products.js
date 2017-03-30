@@ -220,6 +220,8 @@ ProductsModel.prototype.exportBasicData = function(ids, callback) {
             sheet[cell] = { t: 's', v: pro.providers[0].price };
             cell = 'P' + row.toString();
             sheet[cell] = { t: 's', v: pro.providers[0].providerName };
+            cell = 'AE' + row.toString();
+            sheet[cell] = { t: 's', v: a.picurl };
             cell = 'AG' + row.toString();
             sheet[cell] = { t: 's', v: pro.pno + '-' + a.pkey + a.pengvalue };
           });

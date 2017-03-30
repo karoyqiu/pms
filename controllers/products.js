@@ -49,7 +49,8 @@ function __bodyToProduct (body) {
       p.attribs.push({
         pkey: prop,
         pvalue: attribs[prop].loc,
-        pengvalue: attribs[prop].eng
+        pengvalue: attribs[prop].eng,
+        picurl: attribs[prop].pic
       });
     }
   }

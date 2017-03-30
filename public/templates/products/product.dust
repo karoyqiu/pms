@@ -69,7 +69,7 @@
 
     for (var i in oas) {
       var a = oas[i];
-      addAttribute(a.pkey, a.pvalue, a.pengvalue);
+      addAttribute(a.pkey, a.pvalue, a.pengvalue, a.picurl);
     }
 
     for (var i in las) {
@@ -127,7 +127,7 @@
     });
 
     $('#oa-add').click(function () {
-      addAttribute('', '', '');
+      addAttribute('', '', '', '');
     });
 
     $('#or-add').click(function () {
@@ -180,12 +180,13 @@
         var name = $('td:eq(0) input', this).val();
         var value = $('td:eq(1) input', this).val();
         var eng = $('td:eq(2) input', this).val();
-        console.debug(name, value, eng);
+        var pic = $('td:eq(3) input', this).val();
 
         if (name && value && eng) {
           attribs[name] = {
             "loc": value,
-            "eng": eng
+            "eng": eng,
+            "pic": pic
           };
         }
       });
@@ -360,8 +361,13 @@
       + '<td><button class="btn btn-default btn-sm rm-row" data-key="' + name + '" type="button">{@pre type="content" key="remove"/}</button></td></tr>');
   }
 
-  function addAttribute (k, loc, eng) {
-    $('#oa-table > tbody:last').append('<tr><td><input type="text" class="form-control input-sm" value="' + k + '"/></td><td><input type="text" class="form-control input-sm" value="' + loc + '"/></td><td><input type="text" class="form-control input-sm" value="' + eng + '"/></td><td><button class="btn btn-default btn-sm rm-row" type="button">{@pre type="content" key="remove"/}</button></td></tr>');
+  function addAttribute (k, loc, eng, pic) {
+    $('#oa-table > tbody:last').append('<tr>'
+      + '<td><input type="text" class="form-control input-sm" value="' + k + '"/></td>'
+      + '<td><input type="text" class="form-control input-sm" value="' + loc + '"/></td>'
+      + '<td><input type="text" class="form-control input-sm" value="' + eng + '"/></td>'
+      + '<td><input type="text" class="form-control input-sm" value="' + pic + '"/></td>'
+      + '<td><button class="btn btn-default btn-sm rm-row" type="button">{@pre type="content" key="remove"/}</button></td></tr>');
   }
 
   function addLocAttribute (k, v) {
@@ -632,13 +638,14 @@
             <th>{@pre type="content" key="subsku"/}</th>
             <th>{@pre type="content" key="locname"/}</th>
             <th>{@pre type="content" key="engname"/}</th>
+            <th>{@pre type="content" key="picurl"/}</th>
             <th>{@pre type="content" key="actions"/}</th>
           </tr>
         </thead>
         <tbody></tbody>
         <tfoot>
           <tr>
-            <td colspan="3"><button id="oa-add" type="button" class="btn btn-default btn-sm">{@pre type="content" key="add"/}</button></td>
+            <td colspan="5"><button id="oa-add" type="button" class="btn btn-default btn-sm">{@pre type="content" key="add"/}</button></td>
           </tr>
         </tfoot>
       </table>
