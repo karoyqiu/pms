@@ -477,6 +477,24 @@
     </div>
   </div>
   <div class="form-group">
+    <label class="col-sm-2 control-label" for="abbr">{@pre type="content" key="abbr"/}</label>
+    <div class="col-sm-5">
+      <input type="text" class="form-control input-sm" id="abbr" name="abbr" value="{product.abbr}" />
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-sm-2 control-label" for="locdecl">{@pre type="content" key="locdecl"/}</label>
+    <div class="col-sm-5">
+      <input type="text" class="form-control input-sm" id="locdecl" name="locdecl" value="{product.locdecl}" />
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-sm-2 control-label" for="engdecl">{@pre type="content" key="engdecl"/}</label>
+    <div class="col-sm-5">
+      <input type="text" class="form-control input-sm" id="engdecl" name="engdecl" value="{product.engdecl}" />
+    </div>
+  </div>
+  <div class="form-group">
     <label class="col-sm-2 control-label" for="primary-pic">{@pre type="content" key="primaryPicture"/}</label>
     <div class="col-sm-5">
       {?product.primary-pic}
