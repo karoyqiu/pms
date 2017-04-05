@@ -7,6 +7,7 @@ var flash = require('connect-flash');
 var auth = require('./lib/auth');
 var i18n = require('./lib/i18n');
 var db = require('./lib/db');
+var express = require('express');
 
 
 app.configure = function configure(nconf, next) {
@@ -18,6 +19,7 @@ app.configure = function configure(nconf, next) {
 app.requestStart = function requestStart(server) {
   // Run before most express middleware has been registered.
   server.locals.pretty = true;
+  server.use(express.static('public'));
   server.use(flash());
 };
 
