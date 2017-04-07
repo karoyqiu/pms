@@ -736,7 +736,7 @@
   <div class="form-group">
     <label class="col-sm-2 control-label" for="eng-desc">{@pre type="content" key="engdesc"/}</label>
     <div class="col-sm-5">
-      <textarea class="form-control input-sm" id="eng-desc" name="engdesc" rows="3">{product.engdesc}</textarea>
+      <textarea class="form-control input-sm" id="eng-desc" name="engdesc" rows="16">{product.engdesc}</textarea>
     </div>
   </div>
   <div class="form-group">
