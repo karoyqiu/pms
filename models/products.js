@@ -318,4 +318,50 @@ ProductsModel.prototype.exportProviderData = function(ids, callback) {
 };
 
 
+ProductsModel.prototype.exportDescriptions = function(ids, callback) {
+  this.__getCollection(function (err, col) {
+    if (err) {
+      callback(err);
+    } else {
+      var objs = [];
+
+      ids.forEach(function(id) {
+        objs.push(ObjectID.createFromHexString(id));
+      });
+
+      var cursor = col.find({ _id: { $in: objs }});
+      var sheet = { };
+      var row = 1;
+
+      sheet['A1'] = { t: 's', v: 'SKU' };
+      sheet['B1'] = { t: 's', v: '中文描述' };
+      sheet['C1'] = { t: 's', v: '英文描述' };
+
+      cursor.each(function(err, pro) {
+        if (pro) {
+          row++;
+          var cell = 'A' + row.toString();
+          sheet[cell] = { t: 's', v: pro.pno };
+          cell = 'B' + row.toString();
+          sheet[cell] = { t: 's', v: pro.locdesc.replace(/(<([^>]+)>)/ig, '').replace(/&nbsp;/g, ' ') };
+          cell = 'C' + row.toString();
+          sheet[cell] = { t: 's', v: pro.engdesc.replace(/(<([^>]+)>)/ig, '').replace(/&nbsp;/g, ' ') };
+        } else {
+          sheet['!ref'] = 'A1:C' + row.toString();
+          var workbook = {
+            SheetNames: ['产品描述信息'],
+            Sheets: {
+              '产品描述信息': sheet
+            }
+          };
+
+          //console.dir(workbook);
+          callback(null, workbook);
+        }
+      });
+    }
+  });
+};
+
+
 module.exports = ProductsModel;
