@@ -730,7 +730,7 @@
   <div class="form-group">
     <label class="col-sm-2 control-label" for="loc-desc">{@pre type="content" key="locdesc"/}</label>
     <div class="col-sm-5">
-      <textarea class="form-control input-sm" id="loc-desc" name="locdesc" rows="3">{product.locdesc}</textarea>
+      <textarea class="form-control input-sm" id="loc-desc" name="locdesc" rows="16">{product.locdesc}</textarea>
     </div>
   </div>
   <div class="form-group">
