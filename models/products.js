@@ -230,10 +230,19 @@ ProductsModel.prototype.exportBasicData = function(ids, callback) {
             sheet[cell] = { t: 's', v: pro.weight === '' ? 0 : parseFloat(pro.weight) * 1000 };
             cell = 'P' + row.toString();
             sheet[cell] = { t: 's', v: pro.providers[0].providerName };
+            cell = 'Q' + row.toString();
+            sheet[cell] = { t: 's', v: pro.providers[0].price };
             cell = 'AE' + row.toString();
             sheet[cell] = { t: 's', v: a.picurl };
             cell = 'AG' + row.toString();
-            sheet[cell] = { t: 's', v: pro.pno + '-' + a.pkey + a.pengvalue };
+            var sku = pro.pno + '-' + a.pkey + a.pengvalue;
+            var full = sku + ';';
+
+            for (var i = "A".charCodeAt(0); i <= "Z".charCodeAt(0); i++) {
+              full += String.fromCharCode(i) + sku + ';';
+            }
+
+            sheet[cell] = { t: 's', v: full };
           });
         } else {
           sheet['!ref'] = 'A1:AG' + row.toString();
@@ -284,6 +293,8 @@ ProductsModel.prototype.exportProviderData = function(ids, callback) {
               cell = 'B' + row.toString();
               sheet[cell] = { t: 's', v: pro.pno + '-' + a.pkey };
               cell = 'C' + row.toString();
+              sheet[cell] = { t: 's', v: p.price };
+              cell = 'D' + row.toString();
               sheet[cell] = { t: 's', v: p.price };
               cell = 'E' + row.toString();
               sheet[cell] = { t: 's', v: p.link };
