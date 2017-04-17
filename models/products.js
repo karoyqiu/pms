@@ -337,15 +337,19 @@ ProductsModel.prototype.exportDescriptions = function(ids, callback) {
       sheet['B1'] = { t: 's', v: '中文描述' };
       sheet['C1'] = { t: 's', v: '英文描述' };
 
+      function cleanup(s) {
+        return s.trim().replace(/(<([^>]+)>)/ig, '').replace(/&nbsp;/g, ' ').replace(/(\r\n){2,}/g, "\r\n");
+      }
+
       cursor.each(function(err, pro) {
         if (pro) {
           row++;
           var cell = 'A' + row.toString();
           sheet[cell] = { t: 's', v: pro.pno };
           cell = 'B' + row.toString();
-          sheet[cell] = { t: 's', v: pro.locdesc.replace(/(<([^>]+)>)/ig, '').replace(/&nbsp;/g, ' ') };
+          sheet[cell] = { t: 's', v: cleanup(pro.locdesc) };
           cell = 'C' + row.toString();
-          sheet[cell] = { t: 's', v: pro.engdesc.replace(/(<([^>]+)>)/ig, '').replace(/&nbsp;/g, ' ') };
+          sheet[cell] = { t: 's', v: cleanup(pro.engdesc) };
         } else {
           sheet['!ref'] = 'A1:C' + row.toString();
           var workbook = {
