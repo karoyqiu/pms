@@ -69,6 +69,7 @@ function __bodyToRole (body) {
       p_e_engdesc: __onToBool(body.p_e_engdesc),
       p_e_comment: __onToBool(body.p_e_comment),
       p_d: __onToBool(body.p_d),
+      p_x: __onToBool(body.p_x),
       c_q_name: __onToBool(body.c_q_name),
       c_q_code: __onToBool(body.c_q_code),
       c_a_name: __onToBool(body.c_a_name),

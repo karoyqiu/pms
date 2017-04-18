@@ -124,6 +124,9 @@
           </ul>
         </li>
       </ul>
+      <ul class="list-group tree">
+        <li class="list-group-item"><label><input type="checkbox" name="p_x" {?role.permissions.p_x}checked{/role.permissions.p_x}/>{@pre type="content" key="export"/}</label></li>
+      </ul>
     </div>
     <div class="col-sm-3">
       <ul class="list-group tree">

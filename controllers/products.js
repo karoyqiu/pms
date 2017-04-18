@@ -263,6 +263,7 @@ module.exports = function (app) {
                   model.limit = limit;
                   model.query = req.query;
                   model.sort = req.query.sort;
+                  model.user = req.session.user;
                   delete req.query.s;
                   delete req.query.l;
                   delete req.query.sort;
