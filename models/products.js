@@ -334,8 +334,10 @@ ProductsModel.prototype.exportDescriptions = function(ids, callback) {
       var row = 1;
 
       sheet['A1'] = { t: 's', v: 'SKU' };
-      sheet['B1'] = { t: 's', v: '中文描述' };
-      sheet['C1'] = { t: 's', v: '英文描述' };
+      sheet['B1'] = { t: 's', v: '中文名' };
+      sheet['C1'] = { t: 's', v: '英文名' };
+      sheet['D1'] = { t: 's', v: '中文描述' };
+      sheet['E1'] = { t: 's', v: '英文描述' };
 
       function cleanup(s) {
         return s.trim().replace(/(<([^>]+)>)/ig, '').replace(/&nbsp;/g, ' ').replace(/(\r\n){2,}/g, "\r\n");
@@ -347,11 +349,15 @@ ProductsModel.prototype.exportDescriptions = function(ids, callback) {
           var cell = 'A' + row.toString();
           sheet[cell] = { t: 's', v: pro.pno };
           cell = 'B' + row.toString();
-          sheet[cell] = { t: 's', v: cleanup(pro.locdesc) };
+          sheet[cell] = { t: 's', v: pro.locname };
           cell = 'C' + row.toString();
+          sheet[cell] = { t: 's', v: pro.engname };
+          cell = 'D' + row.toString();
+          sheet[cell] = { t: 's', v: cleanup(pro.locdesc) };
+          cell = 'E' + row.toString();
           sheet[cell] = { t: 's', v: cleanup(pro.engdesc) };
         } else {
-          sheet['!ref'] = 'A1:C' + row.toString();
+          sheet['!ref'] = 'A1:E' + row.toString();
           var workbook = {
             SheetNames: ['产品描述信息'],
             Sheets: {
