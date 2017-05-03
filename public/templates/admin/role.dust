@@ -125,7 +125,12 @@
         </li>
       </ul>
       <ul class="list-group tree">
-        <li class="list-group-item"><label><input type="checkbox" name="p_x" {?role.permissions.p_x}checked{/role.permissions.p_x}/>{@pre type="content" key="export"/}</label></li>
+        <li class="list-group-item"><input type="checkbox" /><label class="tree-toggle tree-parent">{@pre type="content" key="export"/} <span class="caret"></span></label>
+          <ul class="list-group tree">
+            <li class="list-group-item"><label><input type="checkbox" name="p_x" {?role.permissions.p_x}checked{/role.permissions.p_x}/>{@pre type="content" key="exportBasicData"/}</label></li>
+            <li class="list-group-item"><label><input type="checkbox" name="p_x_providers" {?role.permissions.p_x_providers}checked{/role.permissions.p_x_providers}/>{@pre type="content" key="exportProviderData"/}</label></li>
+            <li class="list-group-item"><label><input type="checkbox" name="p_x_desc" {?role.permissions.p_x_desc}checked{/role.permissions.p_x_desc}/>{@pre type="content" key="exportDescriptions"/}</label></li>
+          </ul>
       </ul>
     </div>
     <div class="col-sm-3">
